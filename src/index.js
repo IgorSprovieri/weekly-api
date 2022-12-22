@@ -1,6 +1,5 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const { lastDayOfMonth } = require("date-fns");
 const app = express();
 app.use(express.json());
 
@@ -74,6 +73,37 @@ app.post("/task", async (req, res) => {
     });
 
     return res.status(200).json(newTask);
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
+});
+
+app.delete("/task/:id", async (req, res) => {
+  try {
+    const taskDeleted = await listTask.findByIdAndRemove(req.params.id);
+    return res.status(200).json(taskDeleted);
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
+});
+
+app.put("/task/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const taskUpdated = await listTask.findByIdAndUpdate(
+      id,
+      {
+        name: req.body.name,
+        initialDate: req.body.initialDate,
+        finalDate: req.body.finalDate,
+        description: req.body.description,
+        checked: req.body.checked,
+      },
+      {
+        new: true,
+      }
+    );
+    return res.status(200).json(taskUpdated);
   } catch (error) {
     return res.status(400).json({ error });
   }
