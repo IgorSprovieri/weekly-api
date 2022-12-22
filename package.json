@@ -1,0 +1,23 @@
+{
+  "name": "weekly",
+  "version": "1.0.0",
+  "description": "Weekly Organization",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IgorSprovieri/Weekly.git"
+  },
+  "author": "Igor Sprovieri",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IgorSprovieri/Weekly/issues"
+  },
+  "homepage": "https://github.com/IgorSprovieri/Weekly#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
