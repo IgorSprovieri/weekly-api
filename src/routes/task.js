@@ -1,11 +1,38 @@
 const express = require("express");
 const router = express.Router();
 const tasksList = require("../schemas/tasksList");
+const usersList = require("../schemas/tasksList");
+
+async function checkToken(email, token) {
+  const userFounded = await usersList.find({ token: token });
+
+  if (!userFounded) {
+    return false;
+  }
+
+  const today = new Date();
+
+  if (userFounded.tokenValidity < today) {
+    return false;
+  }
+
+  if (email != userFounded.email) {
+    return false;
+  }
+
+  return true;
+}
 
 router.get("/", async (req, res) => {
   try {
     let initialDateTest = new Date(req.body.initialDate);
     let finalDateTest = new Date(req.body.finalDate);
+    const currentEmail = req.headers.email;
+    const token = req.headers.token;
+
+    if (checkToken(currentEmail, token) == false) {
+      return res.status(403).json({ error: "Aceess denied" });
+    }
 
     if (initialDateTest.getDate() > finalDateTest.getDate()) {
       return res
@@ -15,6 +42,7 @@ router.get("/", async (req, res) => {
 
     const tasks = await tasksList
       .find({
+        user_email: currentEmail,
         initialDate: {
           $gte: req.body.initialDate,
           $lt: req.body.finalDate,
@@ -28,12 +56,21 @@ router.get("/", async (req, res) => {
 
     return res.status(200).json(sortedTasks);
   } catch (error) {
-    return res.status(400).json({ error });
+    return res.status(500).json({ error });
   }
 });
 
 router.post("/", async (req, res) => {
   try {
+    const { email, name, initialDate, finalDate, description, checked } =
+      req.body;
+    const currentEmail = req.headers.email;
+    const token = req.headers.token;
+
+    if (checkToken(currentEmail, token) == false) {
+      return res.status(403).json({ error: "Aceess denied" });
+    }
+
     let initialDateTest = new Date(req.body.initialDate);
     let finalDateTest = new Date(req.body.finalDate);
 
@@ -48,42 +85,69 @@ router.post("/", async (req, res) => {
     }
 
     const newTask = await tasksList.create({
-      name: req.body.name,
-      initialDate: req.body.initialDate,
-      finalDate: req.body.finalDate,
-      description: req.body.description,
-      checked: req.body.checked,
+      user_email: currentEmail,
+      name: name,
+      initialDate: initialDate,
+      finalDate: finalDate,
+      description: description,
+      checked: checked,
     });
 
     return res.status(200).json(newTask);
   } catch (error) {
-    return res.status(400).json({ error });
+    return res.status(500).json({ error });
   }
 });
 
 router.delete("/:id", async (req, res) => {
   try {
     const id = req.params.id;
+    const currentEmail = req.headers.email;
+    const token = req.headers.token;
 
-    const taskDeleted = await tasksList.findByIdAndRemove(req.params.id);
+    if (checkToken(currentEmail, token) == false) {
+      return res.status(403).json({ error: "Aceess denied" });
+    }
+
+    const taskFounded = await tasksList.find({ id: id });
+
+    if (taskFounded.user_email != currentEmail) {
+      return res.status(403).json({ error: "Aceess denied" });
+    }
+
+    const taskDeleted = await tasksList.findByIdAndRemove(id);
     return res.status(200).json(taskDeleted);
   } catch (error) {
-    return res.status(400).json({ error });
+    return res.status(500).json({ error });
   }
 });
 
 router.put("/:id", async (req, res) => {
   try {
+    const { name, initialDate, finalDate, description, checked } = req.body;
     const id = req.params.id;
+    const currentEmail = req.headers.email;
+    const token = req.headers.token;
+
+    if (checkToken(currentEmail, token) == false) {
+      return res.status(403).json({ error: "Aceess denied" });
+    }
+
+    const taskFounded = await tasksList.find({ id: id });
+
+    if (taskFounded.user_email != currentEmail) {
+      return res.status(403).json({ error: "Aceess denied" });
+    }
 
     const taskUpdated = await tasksList.findByIdAndUpdate(
       id,
       {
-        name: req.body.name,
-        initialDate: req.body.initialDate,
-        finalDate: req.body.finalDate,
-        description: req.body.description,
-        checked: req.body.checked,
+        user_email: currentEmail,
+        name: name,
+        initialDate: initialDate,
+        finalDate: finalDate,
+        description: description,
+        checked: checked,
       },
       {
         new: true,
@@ -91,7 +155,7 @@ router.put("/:id", async (req, res) => {
     );
     return res.status(200).json(taskUpdated);
   } catch (error) {
-    return res.status(400).json({ error });
+    return res.status(500).json({ error });
   }
 });
 

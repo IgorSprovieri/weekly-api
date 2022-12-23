@@ -15,27 +15,7 @@ async function connectDatabase() {
 }
 
 app.get("/", function (req, res) {
-  res.redirect("/home");
-});
-
-app.get("/home", function (req, res) {
-  res.sendFile(__dirname + "/public/Home/index.html");
-});
-app.get("/home/style.css", function (req, res) {
-  res.sendFile(__dirname + "/public/Home/style.css");
-});
-app.get("/home/index.js", (req, res) => {
-  res.sendFile(__dirname + "/public/Home/index.js");
-});
-
-app.get("/application", function (req, res) {
-  res.sendFile(__dirname + "/public/App/index.html");
-});
-app.get("/application/style.css", function (req, res) {
-  res.sendFile(__dirname + "/public/App/style.css");
-});
-app.get("/application/index.js", (req, res) => {
-  res.sendFile(__dirname + "/public/App/index.js");
+  res.send("It is a task manager API called weekly");
 });
 
 app.listen(port, () => {
