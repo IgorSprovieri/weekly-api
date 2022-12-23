@@ -11,13 +11,13 @@ router.post("/", async (req, res) => {
 
     const userFounded = await usersList.find({ email: email });
 
-    if (!userFounded) {
+    if (!userFounded[0]) {
       return res.status(400).json({ error: "User not found" });
     }
 
     const checkPassword = await bcrypt.compareSync(
       password,
-      userFounded.passwordHash
+      userFounded[0].passwordHash
     );
 
     if (!checkPassword) {
@@ -28,13 +28,16 @@ router.post("/", async (req, res) => {
     let today = new Date();
     let minutes = today.getMinutes + 15;
     today.setMinutes = minutes;
-    const tokenVality = today;
+    const tokenValidity = today;
 
     const userUpdated = await usersList.findByIdAndUpdate(
-      userFounded.id,
+      userFounded[0].id,
       {
+        name: userFounded[0].name,
+        email: userFounded[0].email,
+        passwordHash: userFounded[0].passwordHash,
         token: token,
-        tokenValidity: tokenVality,
+        tokenValidity: tokenValidity,
       },
       {
         new: true,

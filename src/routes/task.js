@@ -6,17 +6,17 @@ const usersList = require("../schemas/tasksList");
 async function checkToken(email, token) {
   const userFounded = await usersList.find({ token: token });
 
-  if (!userFounded) {
+  if (!userFounded[0]) {
     return false;
   }
 
   const today = new Date();
 
-  if (userFounded.tokenValidity < today) {
+  if (userFounded[0].tokenValidity < today) {
     return false;
   }
 
-  if (email != userFounded.email) {
+  if (email != userFounded[0].email) {
     return false;
   }
 
@@ -62,8 +62,7 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { email, name, initialDate, finalDate, description, checked } =
-      req.body;
+    const { name, initialDate, finalDate, description, checked } = req.body;
     const currentEmail = req.headers.email;
     const token = req.headers.token;
 

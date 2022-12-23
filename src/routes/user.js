@@ -7,17 +7,17 @@ const randomToken = require("random-token");
 async function checkToken(id, token) {
   const userFounded = await usersList.find({ token: token });
 
-  if (!userFounded) {
+  if (!userFounded[0]) {
     return false;
   }
 
   const today = new Date();
 
-  if (userFounded.tokenValidity < today) {
+  if (userFounded[0].tokenValidity < today) {
     return false;
   }
 
-  if (id != userFounded.id) {
+  if (id != userFounded[0].id) {
     return false;
   }
 }
@@ -42,7 +42,7 @@ router.post("/", async (req, res) => {
 
     const checkAlreadyExists = await usersList.exists({ email: email });
 
-    if (checkAlreadyExists) {
+    if (checkAlreadyExists[0]) {
       return res.status(400).json({ error: "User already exists" });
     }
 

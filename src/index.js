@@ -1,3 +1,4 @@
+require("dotenv").config;
 const express = require("express");
 const mongoose = require("mongoose");
 const taskRoutes = require("./routes/task");
@@ -6,12 +7,11 @@ const loginRoutes = require("./routes/login");
 const app = express();
 
 app.use(express.json());
-app.use("/static", express.static(__dirname + "/public"));
 
-const port = 3333;
+const port = process.env.PORT;
 
 async function connectDatabase() {
-  await mongoose.connect("mongodb://localhost:27017");
+  await mongoose.connect(process.env.PORT);
 }
 
 app.get("/", function (req, res) {

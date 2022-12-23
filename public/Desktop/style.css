@@ -1,0 +1,125 @@
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap");
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0px;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgb(240, 240, 240);
+}
+
+section.start-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+}
+
+h2.start-app-icon {
+  font-size: 44px;
+  text-align: center;
+  font-family: "Pacifico", cursive;
+  margin: 0px;
+}
+
+h1.start-text {
+  font-size: 80px;
+  text-align: center;
+  width: 1000px;
+  font-family: "Comfortaa", cursive;
+  margin: 60px 0px 110px 0px;
+}
+
+button.start-button {
+  font-family: "Comfortaa", cursive;
+  font-size: 38px;
+  width: 260px;
+  height: 70px;
+
+  background-color: lightsalmon;
+
+  border: 0px;
+  border-radius: 50px;
+  margin: 0px;
+}
+
+section.login-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+}
+
+h2.login-app-icon {
+  font-size: 35px;
+  text-align: center;
+  font-family: "Pacifico", cursive;
+  margin: 0px 0px 60px 0px;
+}
+form.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 300px;
+  height: 320px;
+  border: 0.5px solid gray;
+  border-radius: 10px;
+  margin: 0px 0px 210px 0px;
+}
+
+h3.login-header {
+  font-size: 30px;
+  text-align: center;
+  font-family: "Comfortaa", cursive;
+  margin: 0px 0px 20px 0px;
+}
+
+input.login-input {
+  font-family: "Comfortaa", cursive;
+  font-size: 18px;
+  width: 240px;
+  height: 40px;
+  border: 0.5px solid gray;
+  border-radius: 30px;
+  margin: 4px 0px 4px 0px;
+  padding-left: 16px;
+}
+
+button.login-submit-button {
+  font-family: "Comfortaa", cursive;
+  font-size: 18px;
+
+  background-color: lightsalmon;
+
+  border: 0px;
+  border-radius: 30px;
+
+  width: 200px;
+  height: 40px;
+  margin: 24px 0px 4px 0px;
+}
+.login-register-button {
+  font-family: "Comfortaa", cursive;
+  font-size: 18px;
+
+  background-color: rgb(240, 240, 240);
+
+  border: 1px solid lightsalmon;
+  border-radius: 30px;
+
+  width: 200px;
+  height: 40px;
+  margin-top: 4px;
+}
