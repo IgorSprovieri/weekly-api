@@ -1,4 +1,4 @@
-require("dotenv").config;
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const taskRoutes = require("./routes/task");
@@ -8,10 +8,10 @@ const app = express();
 
 app.use(express.json());
 
-const port = process.env.PORT;
+const port = Number(process.env.PORT);
 
 async function connectDatabase() {
-  await mongoose.connect(process.env.PORT);
+  await mongoose.connect(process.env.DATABASE_URL);
 }
 
 app.get("/", function (req, res) {
@@ -19,6 +19,7 @@ app.get("/", function (req, res) {
 });
 
 app.listen(port, () => {
+  console.log(process.env);
   mongoose.set("strictQuery", true);
   connectDatabase().catch((error) => {
     console.log(error);

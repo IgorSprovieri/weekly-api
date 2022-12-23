@@ -10,7 +10,7 @@ function loginButton() {
   const email = document.getElementById("login-email").value;
   const password = document.getElementById("login-password").value;
 
-  const response = fetch("http://localhost:3333/login", {
+  const response = fetch("https://weekly.herokuapp.com/login", {
     method: "POST",
     body: JSON.stringify({ email: email, password: password }),
   })
