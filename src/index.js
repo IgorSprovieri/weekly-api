@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const tasksRoutes = require("./routes/tasks");
+const taskRoutes = require("./routes/task");
+const userRoutes = require("./routes/user");
+const loginRoutes = require("./routes/login");
 const app = express();
 
 app.use(express.json());
@@ -41,6 +43,8 @@ app.listen(port, () => {
   connectDatabase().catch((error) => {
     console.log(error);
   });
-  app.use("/tasks", tasksRoutes);
+  app.use("/task", taskRoutes);
+  app.use("/user", userRoutes);
+  app.use("/login", loginRoutes);
   console.log(`App listening on port ${port}`);
 });

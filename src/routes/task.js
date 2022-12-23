@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const listTask = require("../schemas/listTask");
+const tasksList = require("../schemas/tasksList");
 
 router.get("/", async (req, res) => {
   try {
@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
         .json({ error: "Final date must be greater than start date" });
     }
 
-    const tasks = await listTask
+    const tasks = await tasksList
       .find({
         initialDate: {
           $gte: req.body.initialDate,
@@ -47,7 +47,7 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "The task overcomming the day" });
     }
 
-    const newTask = await listTask.create({
+    const newTask = await tasksList.create({
       name: req.body.name,
       initialDate: req.body.initialDate,
       finalDate: req.body.finalDate,
@@ -65,7 +65,7 @@ router.delete("/:id", async (req, res) => {
   try {
     const id = req.params.id;
 
-    const taskDeleted = await listTask.findByIdAndRemove(req.params.id);
+    const taskDeleted = await tasksList.findByIdAndRemove(req.params.id);
     return res.status(200).json(taskDeleted);
   } catch (error) {
     return res.status(400).json({ error });
@@ -76,7 +76,7 @@ router.put("/:id", async (req, res) => {
   try {
     const id = req.params.id;
 
-    const taskUpdated = await listTask.findByIdAndUpdate(
+    const taskUpdated = await tasksList.findByIdAndUpdate(
       id,
       {
         name: req.body.name,
