@@ -55,14 +55,37 @@ router.post("/", async (req, res) => {
   }
 });
 
-/*
 router.delete("/:id", async (req, res) => {
   try {
+    const { email, password } = req.body;
+    const currentEmail = req.header.email;
     const token = req.header.token;
     const id = req.params.id;
 
-    if (!req.params.id) {
-      return res.status(400).json({ error: "Id params is mandatory" });
+    if (!req.body.email || !req.body.password) {
+      return res.status(400).json({ error: "Missing information on body" });
+    }
+
+    if (!req.params.id || !req.headers.email || req.headers.token) {
+      return res.status(400).json({ error: "Missing information" });
+    }
+
+    if (checkOnlyNumbers(password) == false || password.length != 4) {
+      return res.status(400).json({
+        error: "The password need to be 4 numbers and the type is string",
+      });
+    }
+
+    if (email.length < 3 || !email.includes("@") || !email.includes(".")) {
+      return res.status(400).json({ error: "Invalid email" });
+    }
+
+    if (
+      currentEmail.length < 3 ||
+      !currentEmail.includes("@") ||
+      !currentEmail.includes(".")
+    ) {
+      return res.status(400).json({ error: "Invalid current email" });
     }
 
     const userFound = await usersList.find({ id: id });
@@ -71,10 +94,23 @@ router.delete("/:id", async (req, res) => {
       return res.status(400).json({ error: "User not found" });
     }
 
+    if (currentEmail != userFound[0].email || email != userFound[0].email) {
+      return res.status(403).json({ error: "Aceess denied" });
+    }
+
     const checkTokenResponse = await checkToken(id, token);
 
     if (checkTokenResponse == false) {
       return res.status(403).json({ error: "Aceess denied" });
+    }
+
+    const checkPassword = await bcrypt.compareSync(
+      password,
+      userFound[0].passwordHash
+    );
+
+    if (!checkPassword) {
+      return res.status(403).json({ error: "Password is invalid" });
     }
 
     const userDeleted = await usersList.findByIdAndRemove(id);
@@ -84,6 +120,7 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+/*
 router.put("/:id", async (req, res) => {
   try {
     const { name, email, password } = req.body;
