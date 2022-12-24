@@ -1,27 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const tasksList = require("../schemas/tasksList");
-const usersList = require("../schemas/tasksList");
-
-async function checkToken(email, token) {
-  const userFounded = await usersList.find({ token: token });
-
-  if (!userFounded[0]) {
-    return false;
-  }
-
-  const today = new Date();
-
-  if (userFounded[0].tokenValidity < today) {
-    return false;
-  }
-
-  if (email != userFounded[0].email) {
-    return false;
-  }
-
-  return true;
-}
+const tk = require("../tk");
 
 router.get("/", async (req, res) => {
   try {
@@ -30,7 +10,13 @@ router.get("/", async (req, res) => {
     const currentEmail = req.headers.email;
     const token = req.headers.token;
 
-    if (checkToken(currentEmail, token) == false) {
+    const userFound = await usersList.find({ email: currentEmail });
+
+    if (!userFound[0]) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    if (tk.checkToken(userFound[0].id, token) == false) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
@@ -42,7 +28,7 @@ router.get("/", async (req, res) => {
 
     const tasks = await tasksList
       .find({
-        user_email: currentEmail,
+        user_id: userFound[0].id,
         initialDate: {
           $gte: req.body.initialDate,
           $lt: req.body.finalDate,
@@ -66,7 +52,13 @@ router.post("/", async (req, res) => {
     const currentEmail = req.headers.email;
     const token = req.headers.token;
 
-    if (checkToken(currentEmail, token) == false) {
+    const userFound = await usersList.find({ email: currentEmail });
+
+    if (!userFound[0]) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    if (tk.checkToken(userFound[0].id, token) == false) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
@@ -84,7 +76,7 @@ router.post("/", async (req, res) => {
     }
 
     const newTask = await tasksList.create({
-      user_email: currentEmail,
+      user_id: userFound[0].id,
       name: name,
       initialDate: initialDate,
       finalDate: finalDate,
@@ -104,13 +96,19 @@ router.delete("/:id", async (req, res) => {
     const currentEmail = req.headers.email;
     const token = req.headers.token;
 
-    if (checkToken(currentEmail, token) == false) {
+    const userFound = await usersList.find({ email: currentEmail });
+
+    if (!userFound[0]) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    if (tk.checkToken(userFound[0].id, token) == false) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
-    const taskFounded = await tasksList.find({ id: id });
+    const taskFound = await tasksList.find({ id: id });
 
-    if (taskFounded.user_email != currentEmail) {
+    if (taskFound[0].user_id != userFound[0].id) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
@@ -128,20 +126,26 @@ router.put("/:id", async (req, res) => {
     const currentEmail = req.headers.email;
     const token = req.headers.token;
 
-    if (checkToken(currentEmail, token) == false) {
+    const userFound = await usersList.find({ email: currentEmail });
+
+    if (!userFound[0]) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    if (tk.checkToken(userFound[0].id, token) == false) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
-    const taskFounded = await tasksList.find({ id: id });
+    const taskFound = await tasksList.find({ id: id });
 
-    if (taskFounded.user_email != currentEmail) {
+    if (taskFound[0].user_id != userFound[0].id) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
     const taskUpdated = await tasksList.findByIdAndUpdate(
       id,
       {
-        user_email: currentEmail,
+        user_id: userFound[0].id,
         name: name,
         initialDate: initialDate,
         finalDate: finalDate,

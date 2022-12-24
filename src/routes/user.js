@@ -3,24 +3,7 @@ const router = express.Router();
 const usersList = require("../schemas/usersList");
 const bcrypt = require("bcrypt");
 const randomToken = require("random-token");
-
-async function checkToken(id, token) {
-  const userFounded = await usersList.find({ token: token });
-
-  if (!userFounded[0]) {
-    return false;
-  }
-
-  const today = new Date();
-
-  if (userFounded[0].tokenValidity < today) {
-    return false;
-  }
-
-  if (id != userFounded[0].id) {
-    return false;
-  }
-}
+const tk = require("../tk");
 
 function checkOnlyNumbers(str) {
   return /^\d+$/.test(str);
@@ -48,17 +31,12 @@ router.post("/", async (req, res) => {
 
     const hash = bcrypt.hashSync(password, 10);
     const token = randomToken(16);
-    let today = new Date();
-    let minutes = today.getMinutes + 15;
-    today.setMinutes = minutes;
-    const tokenValidity = today;
 
     const newUser = await usersList.create({
       name: name,
       email: email,
       passwordHash: hash,
       token: token,
-      tokenValidity: tokenValidity,
     });
 
     return res.status(200).json(newUser);
@@ -72,7 +50,7 @@ router.delete("/:id", async (req, res) => {
     const token = req.header.token;
     const id = req.params.id;
 
-    if (checkToken(id, token) == false) {
+    if (tk.checkToken(id, token) == false) {
       return res.status(403).json({ error: "aceess denied" });
     }
 
@@ -89,7 +67,7 @@ router.put("/:id", async (req, res) => {
     const token = req.header.token;
     const id = req.params.id;
 
-    if (checkToken(id, token) == false) {
+    if (tk.checkToken(id, token) == false) {
       return res.status(403).json({ error: "aceess denied" });
     }
 
