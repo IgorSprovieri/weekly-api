@@ -42,7 +42,7 @@ router.post("/", async (req, res) => {
 
     const checkAlreadyExists = await usersList.exists({ email: email });
 
-    if (checkAlreadyExists[0]) {
+    if (checkAlreadyExists) {
       return res.status(400).json({ error: "User already exists" });
     }
 
@@ -51,14 +51,14 @@ router.post("/", async (req, res) => {
     let today = new Date();
     let minutes = today.getMinutes + 15;
     today.setMinutes = minutes;
-    const tokenVality = today;
+    const tokenValidity = today;
 
     const newUser = await usersList.create({
       name: name,
       email: email,
       passwordHash: hash,
       token: token,
-      tokenValidity: tokenVality,
+      tokenValidity: tokenValidity,
     });
 
     return res.status(200).json(newUser);

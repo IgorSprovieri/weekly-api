@@ -19,7 +19,6 @@ app.get("/", function (req, res) {
 });
 
 app.listen(port, () => {
-  console.log(process.env);
   mongoose.set("strictQuery", true);
   connectDatabase().catch((error) => {
     console.log(error);
