@@ -1,39 +1,24 @@
 const express = require("express");
 const router = express.Router();
 const tasksList = require("../schemas/tasksList");
-const usersList = require("../schemas/usersList");
 const checkToken = require("../checkToken");
 
 router.get("/", async (req, res) => {
   try {
-    let initialDateTest = new Date(req.body.initialDate);
-    let finalDateTest = new Date(req.body.finalDate);
-    const currentEmail = req.headers.email;
+    const { user_id, initialDate, finalDate } = req.body;
+    let initialDateTest = new Date(initialDate);
+    let finalDateTest = new Date(finalDate);
     const token = req.headers.token;
 
-    if (!req.body.initialDateTest || !req.body.finalDateTest) {
+    if (!user_id || !initialDate || !finalDate) {
       return res.status(400).json({ error: "Missing information on body" });
     }
 
-    if (!req.params.id || !req.headers.email || req.headers.token) {
-      return res.status(400).json({ error: "Missing information" });
+    if (!token) {
+      return res.status(400).json({ error: "Token is missing" });
     }
 
-    if (
-      currentEmail.length < 3 ||
-      !currentEmail.includes("@") ||
-      !currentEmail.includes(".")
-    ) {
-      return res.status(400).json({ error: "Invalid email" });
-    }
-
-    const userFound = await usersList.find({ email: currentEmail });
-
-    if (!userFound[0]) {
-      return res.status(400).json({ error: "User not found" });
-    }
-
-    const checkTokenResponse = await checkToken(userFound[0].id, token);
+    const checkTokenResponse = await checkToken(user_id, token);
 
     if (checkTokenResponse == false) {
       return res.status(403).json({ error: "Aceess denied" });
@@ -47,10 +32,10 @@ router.get("/", async (req, res) => {
 
     const tasks = await tasksList
       .find({
-        user_id: userFound[0].id,
+        user_id: user_id,
         initialDate: {
-          $gte: req.body.initialDate,
-          $lt: req.body.finalDate,
+          $gte: initialDate,
+          $lt: finalDate,
         },
       })
       .exec();
@@ -67,39 +52,30 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { name, initialDate, finalDate, description, checked } = req.body;
-    const currentEmail = req.headers.email;
+    const { user_id, name, initialDate, finalDate, description, checked } =
+      req.body;
     const token = req.headers.token;
 
     if (
-      !req.body.name ||
-      !req.body.initialDate ||
-      !req.body.finalDate ||
-      !req.body.description ||
-      !req.body.checked
+      !user_id ||
+      !name ||
+      !initialDate ||
+      !finalDate ||
+      !description ||
+      !checked
     ) {
       return res.status(400).json({ error: "Missing information on body" });
     }
 
-    if (!req.params.id || !req.headers.email || req.headers.token) {
-      return res.status(400).json({ error: "Missing information" });
+    if (!token) {
+      return res.status(400).json({ error: "Token is missing" });
     }
 
-    if (
-      currentEmail.length < 3 ||
-      !currentEmail.includes("@") ||
-      !currentEmail.includes(".")
-    ) {
-      return res.status(400).json({ error: "Invalid email" });
+    if (checked != "true" && checked != "false") {
+      return res.status(400).json({ error: "Checked is boolean" });
     }
 
-    const userFound = await usersList.find({ email: currentEmail });
-
-    if (!userFound[0]) {
-      return res.status(400).json({ error: "User not found" });
-    }
-
-    const checkTokenResponse = await checkToken(userFound[0].id, token);
+    const checkTokenResponse = await checkToken(user_id, token);
 
     if (checkTokenResponse == false) {
       return res.status(403).json({ error: "Aceess denied" });
@@ -119,7 +95,7 @@ router.post("/", async (req, res) => {
     }
 
     const newTask = await tasksList.create({
-      user_id: userFound[0].id,
+      user_id: user_id,
       name: name,
       initialDate: initialDate,
       finalDate: finalDate,
@@ -135,35 +111,21 @@ router.post("/", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
+    const user_id = req.body.user_id;
     const id = req.params.id;
-    const currentEmail = req.headers.email;
     const token = req.headers.token;
 
-    if (!req.params.id || !req.headers.email || req.headers.token) {
+    if (!user_id || !id || !token) {
       return res.status(400).json({ error: "Missing information" });
     }
 
-    if (
-      currentEmail.length < 3 ||
-      !currentEmail.includes("@") ||
-      !currentEmail.includes(".")
-    ) {
-      return res.status(400).json({ error: "Invalid email" });
-    }
-
-    const userFound = await usersList.find({ email: currentEmail });
-
-    if (!userFound[0]) {
-      return res.status(400).json({ error: "User not found" });
-    }
-
-    const checkTokenResponse = await checkToken(userFound[0].id, token);
+    const checkTokenResponse = await checkToken(user_id, token);
 
     if (checkTokenResponse == false) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
-    const taskFound = await tasksList.find({ id: id });
+    const taskFound = await tasksList.findById(id);
 
     if (taskFound[0].user_id != userFound[0].id) {
       return res.status(403).json({ error: "Aceess denied" });
@@ -178,36 +140,28 @@ router.delete("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    const { name, initialDate, finalDate, description, checked } = req.body;
+    const { user_id, name, initialDate, finalDate, description, checked } =
+      req.body;
     const id = req.params.id;
-    const currentEmail = req.headers.email;
     const token = req.headers.token;
 
-    if (!req.params.id || !req.headers.email || req.headers.token) {
+    if (!id || !token) {
       return res.status(400).json({ error: "Missing information" });
     }
 
-    if (
-      currentEmail.length < 3 ||
-      !currentEmail.includes("@") ||
-      !currentEmail.includes(".")
-    ) {
-      return res.status(400).json({ error: "Invalid email" });
+    if (checked) {
+      if (checked != "true" && checked != "false") {
+        return res.status(400).json({ error: "Checked is boolean" });
+      }
     }
 
-    const userFound = await usersList.find({ email: currentEmail });
-
-    if (!userFound[0]) {
-      return res.status(400).json({ error: "User not found" });
-    }
-
-    const checkTokenResponse = await checkToken(userFound[0].id, token);
+    const checkTokenResponse = await checkToken(user_id, token);
 
     if (checkTokenResponse == false) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
-    const taskFound = await tasksList.find({ id: id });
+    const taskFound = await tasksList.findById(id);
 
     if (taskFound[0].user_id != userFound[0].id) {
       return res.status(403).json({ error: "Aceess denied" });
@@ -217,11 +171,11 @@ router.put("/:id", async (req, res) => {
       id,
       {
         user_id: userFound[0].id,
-        name: name || taskFound[0].name,
-        initialDate: initialDate || taskFound[0].nainitialDateme,
-        finalDate: finalDate || taskFound[0].finalDate,
-        description: description || taskFound[0].description,
-        checked: checked || taskFound[0].checked,
+        name: name,
+        initialDate: initialDate,
+        finalDate: finalDate,
+        description: description,
+        checked: checked,
       },
       {
         new: true,
