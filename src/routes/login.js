@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-
 const usersList = require("../schemas/usersList");
 const bcrypt = require("bcrypt");
 const randomToken = require("random-token");
@@ -27,11 +26,11 @@ router.post("/", async (req, res) => {
     const token = randomToken(16);
 
     const userUpdated = await usersList.findByIdAndUpdate(
-      userFounded[0].id,
+      userFound[0].id,
       {
-        name: userFounded[0].name,
-        email: userFounded[0].email,
-        passwordHash: userFounded[0].passwordHash,
+        name: userFound[0].name,
+        email: userFound[0].email,
+        passwordHash: userFound[0].passwordHash,
         token: token,
       },
       {

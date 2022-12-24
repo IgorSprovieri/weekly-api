@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const tasksList = require("../schemas/tasksList");
-const tk = require("../tk");
+const usersList = require("../schemas/usersList");
+const checkToken = require("../checkToken");
 
 router.get("/", async (req, res) => {
   try {
@@ -16,7 +17,9 @@ router.get("/", async (req, res) => {
       return res.status(400).json({ error: "User not found" });
     }
 
-    if (tk.checkToken(userFound[0].id, token) == false) {
+    const checkTokenResponse = await checkToken(userFound[0].id, token);
+
+    if (checkTokenResponse == false) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
@@ -58,14 +61,16 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "User not found" });
     }
 
-    if (tk.checkToken(userFound[0].id, token) == false) {
+    const checkTokenResponse = await checkToken(userFound[0].id, token);
+
+    if (checkTokenResponse == false) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
     let initialDateTest = new Date(req.body.initialDate);
     let finalDateTest = new Date(req.body.finalDate);
 
-    if (initialDateTest.getDate() > finalDateTest.getDate()) {
+    if (initialDateTest > finalDateTest) {
       return res
         .status(400)
         .json({ error: "Final date must be greater than start date" });
@@ -96,13 +101,19 @@ router.delete("/:id", async (req, res) => {
     const currentEmail = req.headers.email;
     const token = req.headers.token;
 
+    if (!req.params.id) {
+      return res.status(400).json({ error: "Id params is mandatory" });
+    }
+
     const userFound = await usersList.find({ email: currentEmail });
 
     if (!userFound[0]) {
       return res.status(400).json({ error: "User not found" });
     }
 
-    if (tk.checkToken(userFound[0].id, token) == false) {
+    const checkTokenResponse = await checkToken(userFound[0].id, token);
+
+    if (checkTokenResponse == false) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
@@ -126,13 +137,19 @@ router.put("/:id", async (req, res) => {
     const currentEmail = req.headers.email;
     const token = req.headers.token;
 
+    if (!req.params.id) {
+      return res.status(400).json({ error: "Id params is mandatory" });
+    }
+
     const userFound = await usersList.find({ email: currentEmail });
 
     if (!userFound[0]) {
       return res.status(400).json({ error: "User not found" });
     }
 
-    if (tk.checkToken(userFound[0].id, token) == false) {
+    const checkTokenResponse = await checkToken(userFound[0].id, token);
+
+    if (checkTokenResponse == false) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 

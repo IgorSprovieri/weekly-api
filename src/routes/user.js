@@ -3,7 +3,7 @@ const router = express.Router();
 const usersList = require("../schemas/usersList");
 const bcrypt = require("bcrypt");
 const randomToken = require("random-token");
-const tk = require("../tk");
+const checkToken = require("../checkToken");
 
 function checkOnlyNumbers(str) {
   return /^\d+$/.test(str);
@@ -50,8 +50,20 @@ router.delete("/:id", async (req, res) => {
     const token = req.header.token;
     const id = req.params.id;
 
-    if (tk.checkToken(id, token) == false) {
-      return res.status(403).json({ error: "aceess denied" });
+    if (!req.params.id) {
+      return res.status(400).json({ error: "Id params is mandatory" });
+    }
+
+    const userFound = await usersList.find({ id: id });
+
+    if (!userFound[0]) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    const checkTokenResponse = await checkToken(id, token);
+
+    if (checkTokenResponse == false) {
+      return res.status(403).json({ error: "Aceess denied" });
     }
 
     const userDeleted = await usersList.findByIdAndRemove(id);
@@ -65,10 +77,23 @@ router.put("/:id", async (req, res) => {
   try {
     const { name, email, password } = req.body;
     const token = req.header.token;
+    const currentEmail = req.header.email;
     const id = req.params.id;
 
-    if (tk.checkToken(id, token) == false) {
-      return res.status(403).json({ error: "aceess denied" });
+    if (!req.params.id) {
+      return res.status(400).json({ error: "Id params is mandatory" });
+    }
+
+    const userFound = await usersList.find({ id: id });
+
+    if (!userFound[0]) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    const checkTokenResponse = await checkToken(id, token);
+
+    if (checkTokenResponse == false) {
+      return res.status(403).json({ error: "Aceess denied" });
     }
 
     const hash = bcrypt.hashSync(password, 10);
