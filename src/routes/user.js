@@ -13,6 +13,16 @@ router.post("/", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
+    if (!req.body.name || !req.body.email || req.body.password) {
+      return res.status(400).json({ error: "Missing information" });
+    }
+
+    if (name.length < 3) {
+      return res.status(400).json({
+        error: "The name need to be grater than 2 characters",
+      });
+    }
+
     if (checkOnlyNumbers(password) == false || password.length != 4) {
       return res.status(400).json({
         error: "The password need to be 4 numbers and the type is string",
@@ -45,6 +55,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+/*
 router.delete("/:id", async (req, res) => {
   try {
     const token = req.header.token;
@@ -114,7 +125,7 @@ router.put("/:id", async (req, res) => {
     return res.status(500).json({ error });
   }
 });
-
+*/
 module.exports = router;
 
 /*

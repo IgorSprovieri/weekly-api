@@ -5,6 +5,7 @@ const usersListSchema = new mongoose.Schema({
   email: String,
   passwordHash: String,
   token: String,
+  //editAccountToken: String,
 });
 
 module.exports = mongoose.model("users", usersListSchema);

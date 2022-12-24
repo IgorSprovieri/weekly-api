@@ -11,6 +11,22 @@ router.get("/", async (req, res) => {
     const currentEmail = req.headers.email;
     const token = req.headers.token;
 
+    if (!req.body.initialDateTest || !req.body.finalDateTest) {
+      return res.status(400).json({ error: "Missing information on body" });
+    }
+
+    if (!req.params.id || !req.headers.email || req.headers.token) {
+      return res.status(400).json({ error: "Missing information" });
+    }
+
+    if (
+      currentEmail.length < 3 ||
+      !currentEmail.includes("@") ||
+      !currentEmail.includes(".")
+    ) {
+      return res.status(400).json({ error: "Invalid email" });
+    }
+
     const userFound = await usersList.find({ email: currentEmail });
 
     if (!userFound[0]) {
@@ -54,6 +70,28 @@ router.post("/", async (req, res) => {
     const { name, initialDate, finalDate, description, checked } = req.body;
     const currentEmail = req.headers.email;
     const token = req.headers.token;
+
+    if (
+      !req.body.name ||
+      !req.body.initialDate ||
+      !req.body.finalDate ||
+      !req.body.description ||
+      !req.body.checked
+    ) {
+      return res.status(400).json({ error: "Missing information on body" });
+    }
+
+    if (!req.params.id || !req.headers.email || req.headers.token) {
+      return res.status(400).json({ error: "Missing information" });
+    }
+
+    if (
+      currentEmail.length < 3 ||
+      !currentEmail.includes("@") ||
+      !currentEmail.includes(".")
+    ) {
+      return res.status(400).json({ error: "Invalid email" });
+    }
 
     const userFound = await usersList.find({ email: currentEmail });
 
@@ -101,8 +139,16 @@ router.delete("/:id", async (req, res) => {
     const currentEmail = req.headers.email;
     const token = req.headers.token;
 
-    if (!req.params.id) {
-      return res.status(400).json({ error: "Id params is mandatory" });
+    if (!req.params.id || !req.headers.email || req.headers.token) {
+      return res.status(400).json({ error: "Missing information" });
+    }
+
+    if (
+      currentEmail.length < 3 ||
+      !currentEmail.includes("@") ||
+      !currentEmail.includes(".")
+    ) {
+      return res.status(400).json({ error: "Invalid email" });
     }
 
     const userFound = await usersList.find({ email: currentEmail });
@@ -137,8 +183,16 @@ router.put("/:id", async (req, res) => {
     const currentEmail = req.headers.email;
     const token = req.headers.token;
 
-    if (!req.params.id) {
-      return res.status(400).json({ error: "Id params is mandatory" });
+    if (!req.params.id || !req.headers.email || req.headers.token) {
+      return res.status(400).json({ error: "Missing information" });
+    }
+
+    if (
+      currentEmail.length < 3 ||
+      !currentEmail.includes("@") ||
+      !currentEmail.includes(".")
+    ) {
+      return res.status(400).json({ error: "Invalid email" });
     }
 
     const userFound = await usersList.find({ email: currentEmail });
@@ -163,11 +217,11 @@ router.put("/:id", async (req, res) => {
       id,
       {
         user_id: userFound[0].id,
-        name: name,
-        initialDate: initialDate,
-        finalDate: finalDate,
-        description: description,
-        checked: checked,
+        name: name || taskFound[0].name,
+        initialDate: initialDate || taskFound[0].nainitialDateme,
+        finalDate: finalDate || taskFound[0].finalDate,
+        description: description || taskFound[0].description,
+        checked: checked || taskFound[0].checked,
       },
       {
         new: true,

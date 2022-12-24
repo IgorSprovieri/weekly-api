@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const taskRoutes = require("./routes/task");
 const userRoutes = require("./routes/user");
-const loginRoutes = require("./routes/login");
+const loginRoutes = require("./routes/session");
 const app = express();
 app.use(express.json());
 app.use(
@@ -30,6 +30,6 @@ app.listen(port, () => {
   });
   app.use("/task", taskRoutes);
   app.use("/user", userRoutes);
-  app.use("/login", loginRoutes);
+  app.use("/session", loginRoutes);
   console.log(`App listening on port ${port}`);
 });
