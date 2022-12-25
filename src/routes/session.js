@@ -13,7 +13,9 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: "Missing information" });
+      return res
+        .status(400)
+        .json({ error: "Missing information: email or password" });
     }
 
     if (checkOnlyNumbers(password) == false || password.length != 4) {
@@ -65,7 +67,9 @@ router.put("/logout/:id", async (req, res) => {
     const id = req.params.id;
 
     if (!id || !token) {
-      return res.status(400).json({ error: "Missing information" });
+      return res
+        .status(400)
+        .json({ error: "Missing information: id or token" });
     }
 
     const userFound = await usersList.findById(id);

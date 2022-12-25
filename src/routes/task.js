@@ -10,12 +10,12 @@ router.get("/", async (req, res) => {
     let finalDateTest = new Date(finalDate);
     const token = req.headers.token;
 
-    if (!user_id || !initialDate || !finalDate) {
+    if (!initialDate || !finalDate) {
       return res.status(400).json({ error: "Missing information on body" });
     }
 
-    if (!token) {
-      return res.status(400).json({ error: "Token is missing" });
+    if (!token || !user_id) {
+      return res.status(400).json({ error: "Token or user id is missing" });
     }
 
     const checkTokenResponse = await checkToken(user_id, token);
@@ -115,8 +115,10 @@ router.delete("/:id", async (req, res) => {
     const id = req.params.id;
     const token = req.headers.token;
 
-    if (!user_id || !id || !token) {
-      return res.status(400).json({ error: "Missing information" });
+    if (!id || !token || !user_id) {
+      return res
+        .status(400)
+        .json({ error: "Missing information: user id, token or task id" });
     }
 
     const checkTokenResponse = await checkToken(user_id, token);
@@ -145,8 +147,10 @@ router.put("/:id", async (req, res) => {
     const id = req.params.id;
     const token = req.headers.token;
 
-    if (!id || !token) {
-      return res.status(400).json({ error: "Missing information" });
+    if (!id || !token || !user_id) {
+      return res
+        .status(400)
+        .json({ error: "Missing information: user id, token or task id" });
     }
 
     if (checked) {
@@ -170,7 +174,7 @@ router.put("/:id", async (req, res) => {
     const taskUpdated = await tasksList.findByIdAndUpdate(
       id,
       {
-        user_id: userFound[0].id,
+        user_id: user_id,
         name: name,
         initialDate: initialDate,
         finalDate: finalDate,
