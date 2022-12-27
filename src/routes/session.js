@@ -31,7 +31,7 @@ router.post("/login", async (req, res) => {
     const userFound = await usersList.find({ email: email });
 
     if (!userFound[0]) {
-      return res.status(400).json({ error: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
     const checkPassword = await bcrypt.compareSync(
@@ -61,7 +61,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.put("/logout/:id", async (req, res) => {
+router.post("/logout/:id", async (req, res) => {
   try {
     const token = req.headers.token;
     const id = req.params.id;
@@ -75,7 +75,7 @@ router.put("/logout/:id", async (req, res) => {
     const userFound = await usersList.findById(id);
 
     if (!userFound[0]) {
-      return res.status(400).json({ error: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
     const checkTokenResponse = await checkToken(id, token);
