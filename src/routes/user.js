@@ -68,7 +68,7 @@ router.delete("/:id", async (req, res) => {
       return res.status(cTkRes.status).json({ error: cTkRes.message });
     }
 
-    const userFound = usersList.findById(id);
+    const userFound = await usersList.findById(id);
     const checkPassword = await bcrypt.compareSync(
       password,
       userFound.passwordHash
