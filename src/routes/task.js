@@ -1,28 +1,33 @@
 const express = require("express");
 const router = express.Router();
 const tasksList = require("../lists/tasks");
-const usersList = require("../lists/users");
 const checkToken = require("../checkToken");
 
 router.get("/", async (req, res) => {
+  const { user_id, initialDate, finalDate } = req.body;
+  let initialDateTest = new Date(initialDate);
+  let finalDateTest = new Date(finalDate);
+  const token = req.headers.token;
+
   try {
-    const { user_id, initialDate, finalDate } = req.body;
-    let initialDateTest = new Date(initialDate);
-    let finalDateTest = new Date(finalDate);
-    const token = req.headers.token;
+    await tasksList.validate({
+      user_id: user_id,
+      initialDate: initialDate,
+      finalDate: finalDate,
+    });
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
 
-    if (!initialDate || !finalDate) {
-      return res.status(400).json({ error: "Missing information on body" });
+  try {
+    if (!token) {
+      return res.status(400).json({ error: "Token is missing" });
     }
 
-    if (!token || !user_id) {
-      return res.status(400).json({ error: "Token or user id is missing" });
-    }
+    const cTkRes = await checkToken(user_id, token);
 
-    const checkTokenResponse = await checkToken(user_id, token);
-
-    if (checkTokenResponse == false) {
-      return res.status(403).json({ error: "Aceess denied" });
+    if (cTkRes.access == false) {
+      return res.status(cTkRes.status).json({ error: cTkRes.message });
     }
 
     if (initialDateTest.getDate() > finalDateTest.getDate()) {
@@ -57,7 +62,6 @@ router.post("/", async (req, res) => {
   const token = req.headers.token;
 
   try {
-    await usersList.validate({ _id: user_id });
     await tasksList.validate({
       user_id: user_id,
       name: name,
@@ -70,40 +74,30 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error });
   }
 
-  if (!token) {
-    return res.status(400).json({ error: "Token is missing" });
-  }
-
-  const userExists = await usersList.exists({ _id: user_id });
-
-  if (!userExists) {
-    return res.status(404).json({ error: "User not found" });
-  }
-
-  const userFoundWithToken = await usersList.find({ token: token });
-
-  if (!userFoundWithToken[0]) {
-    return res.status(404).json({ error: "Token not found" });
-  }
-
-  if (user_id != userFoundWithToken[0].id) {
-    return res.status(403).json({ error: "Token is invalid" });
-  }
-
-  let initialDateTest = new Date(req.body.initialDate);
-  let finalDateTest = new Date(req.body.finalDate);
-
-  if (initialDateTest > finalDateTest) {
-    return res
-      .status(400)
-      .json({ error: "Final date must be greater than start date" });
-  }
-
-  if (initialDateTest.getDate() != finalDateTest.getDate()) {
-    return res.status(400).json({ error: "The task overcomming the day" });
-  }
-
   try {
+    if (!token) {
+      return res.status(400).json({ error: "Token is missing" });
+    }
+
+    const cTkRes = await checkToken(user_id, token);
+
+    if (cTkRes.access == false) {
+      return res.status(cTkRes.status).json({ error: cTkRes.message });
+    }
+
+    let initialDateTest = new Date(req.body.initialDate);
+    let finalDateTest = new Date(req.body.finalDate);
+
+    if (initialDateTest > finalDateTest) {
+      return res
+        .status(400)
+        .json({ error: "Final date must be greater than start date" });
+    }
+
+    if (initialDateTest.getDate() != finalDateTest.getDate()) {
+      return res.status(400).json({ error: "The task overcomming the day" });
+    }
+
     const newTask = await tasksList.create({
       user_id: user_id,
       name: name,
@@ -120,21 +114,30 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-  try {
-    const user_id = req.body.user_id;
-    const id = req.params.id;
-    const token = req.headers.token;
+  const user_id = req.body.user_id;
+  const id = req.params.id;
+  const token = req.headers.token;
 
-    if (!id || !token || !user_id) {
-      return res
-        .status(400)
-        .json({ error: "Missing information: user id, token or task id" });
+  try {
+    await tasksList.validate({
+      _id: id,
+      user_id: user_id,
+      initialDate: new Date(),
+      finalDate: new Date(),
+    });
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
+
+  try {
+    if (!token) {
+      return res.status(400).json({ error: "Token is missing" });
     }
 
-    const checkTokenResponse = await checkToken(user_id, token);
+    const cTkRes = await checkToken(user_id, token);
 
-    if (checkTokenResponse == false) {
-      return res.status(403).json({ error: "Aceess denied" });
+    if (cTkRes.access == false) {
+      return res.status(cTkRes.status).json({ error: cTkRes.message });
     }
 
     const taskExists = await tasksList.exists({ _id: id });
@@ -157,28 +160,34 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
+  const { user_id, name, initialDate, finalDate, description, checked } =
+    req.body;
+  const id = req.params.id;
+  const token = req.headers.token;
+
   try {
-    const { user_id, name, initialDate, finalDate, description, checked } =
-      req.body;
-    const id = req.params.id;
-    const token = req.headers.token;
+    await tasksList.validate({
+      _id: id,
+      user_id: user_id,
+      name: name,
+      initialDate: initialDate || new Date(),
+      finalDate: finalDate || new Date(),
+      description: description,
+      checked: checked,
+    });
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
 
-    if (!id || !token || !user_id) {
-      return res
-        .status(400)
-        .json({ error: "Missing information: user id, token or task id" });
+  try {
+    if (!token) {
+      return res.status(400).json({ error: "Token is missing" });
     }
 
-    if (checked) {
-      if (checked != "true" && checked != "false") {
-        return res.status(400).json({ error: "Checked is boolean" });
-      }
-    }
+    const cTkRes = await checkToken(user_id, token);
 
-    const checkTokenResponse = await checkToken(user_id, token);
-
-    if (checkTokenResponse == false) {
-      return res.status(403).json({ error: "Aceess denied" });
+    if (cTkRes.access == false) {
+      return res.status(cTkRes.status).json({ error: cTkRes.message });
     }
 
     const taskExists = await tasksList.exists({ _id: id });
@@ -198,8 +207,8 @@ router.put("/:id", async (req, res) => {
       {
         user_id: user_id,
         name: name,
-        initialDate: initialDate,
-        finalDate: finalDate,
+        initialDate: initialDate || taskFound.initialDate,
+        finalDate: finalDate || taskFound.finalDate,
         description: description,
         checked: checked,
       },
