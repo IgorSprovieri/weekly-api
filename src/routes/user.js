@@ -1,51 +1,39 @@
 const express = require("express");
 const router = express.Router();
-const usersList = require("../schemas/usersList");
-const tasksList = require("../schemas/tasksList");
+const usersList = require("../lists/users");
+const tasksList = require("../lists/tasks");
 const bcrypt = require("bcrypt");
 const randomToken = require("random-token");
 const checkToken = require("../checkToken");
 
-function checkOnlyNumbers(str) {
-  return /^\d+$/.test(str);
-}
-
 router.post("/", async (req, res) => {
+  const { name, email, password } = req.body;
+  const hash = bcrypt.hashSync(password, 10);
+  const token = randomToken(16);
+
   try {
-    const { name, email, password } = req.body;
+    await usersList.validate({
+      name: name,
+      email: email,
+      password: password,
+      passwordHash: hash,
+      token: token,
+    });
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ error: "Missing information" });
-    }
+  const checkAlreadyExists = await usersList.exists({ email: email });
 
-    if (name.length < 3) {
-      return res.status(400).json({
-        error: "The name need to be grater than 2 characters",
-      });
-    }
+  if (checkAlreadyExists) {
+    return res.status(400).json({ error: "User already exists" });
+  }
 
-    if (checkOnlyNumbers(password) == false || password.length != 4) {
-      return res.status(400).json({
-        error: "The password need to be 4 numbers and the type is string",
-      });
-    }
-
-    if (email.length < 3 || !email.includes("@") || !email.includes(".")) {
-      return res.status(400).json({ error: "Invalid email" });
-    }
-
-    const checkAlreadyExists = await usersList.exists({ email: email });
-
-    if (checkAlreadyExists) {
-      return res.status(400).json({ error: "User already exists" });
-    }
-
-    const hash = bcrypt.hashSync(password, 10);
-    const token = randomToken(16);
-
+  try {
     const newUser = await usersList.create({
       name: name,
       email: email,
+      password: "0000",
       passwordHash: hash,
       token: token,
     });
@@ -57,48 +45,33 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
+  const { email, password } = req.body;
+  const token = req.headers.token;
+  const id = req.params.id;
+
   try {
-    const { email, password } = req.body;
-    const token = req.header.token;
-    const id = req.params.id;
+    await usersList.validate({
+      _id: id,
+      email: email,
+      password: password,
+      passwordHash: bcrypt.hashSync(password, 10),
+      token: token,
+    });
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
 
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ error: "Current email and password is necessary on body" });
+  try {
+    const cTkRes = await checkToken(id, token);
+
+    if (cTkRes.access == false) {
+      return res.status(cTkRes.status).json({ error: cTkRes.message });
     }
 
-    if (!id || !token) {
-      return res
-        .status(400)
-        .json({ error: "Missing information: id or token" });
-    }
-
-    if (checkOnlyNumbers(password) == false || password.length != 4) {
-      return res.status(400).json({
-        error: "The password need to be 4 numbers and the type is string",
-      });
-    }
-
-    if (email.length < 3 || !email.includes("@") || !email.includes(".")) {
-      return res.status(400).json({ error: "Invalid email" });
-    }
-
-    const userFound = await usersList.findById(id);
-
-    if (!userFound[0]) {
-      return res.status(400).json({ error: "User not found" });
-    }
-
-    const checkTokenResponse = await checkToken(id, token);
-
-    if (checkTokenResponse == false) {
-      return res.status(403).json({ error: "Aceess denied" });
-    }
-
+    const userFound = usersList.findById(id);
     const checkPassword = await bcrypt.compareSync(
       password,
-      userFound[0].passwordHash
+      userFound.passwordHash
     );
 
     if (!checkPassword) {
@@ -106,7 +79,7 @@ router.delete("/:id", async (req, res) => {
     }
 
     await usersList.findByIdAndRemove(id);
-    await tasksList.find({ user_id: id });
+    await tasksList.deleteMany({ user_id: id });
 
     return res.status(200).json({ success: "User deleted" });
   } catch (error) {
@@ -115,92 +88,58 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
+  const { newName, newEmail, newPassword, password } = req.body;
+  const token = req.headers.token;
+  const id = req.params.id;
+
   try {
-    const { newName, newEmail, newPassword, email, password } = req.body;
-    const token = req.header.token;
-    const id = req.params.id;
+    await usersList.validate({
+      _id: id,
+      name: newName || "my name test",
+      email: newEmail || "test@test.com",
+      password: newPassword || password,
+      passwordHash: bcrypt.hashSync(newPassword || password, 10),
+      token: token,
+    });
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
 
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ error: "Current email and password is necessary on body" });
-    }
+  try {
+    const cTkRes = await checkToken(id, token);
 
-    if (!id || !token) {
-      return res
-        .status(400)
-        .json({ error: "Missing information: id or token" });
-    }
-
-    if (checkOnlyNumbers(password) == false || password.length != 4) {
-      return res.status(400).json({
-        error: "The password need to be 4 numbers and the type is string",
-      });
-    }
-
-    if (email.length < 3 || !email.includes("@") || !email.includes(".")) {
-      return res.status(400).json({ error: "Invalid email" });
-    }
-
-    if (newName) {
-      if (newName.length < 3) {
-        return res.status(400).json({ error: "New name is inavlid" });
-      }
-    }
-
-    if (newEmail) {
-      if (
-        newEmail.length < 3 ||
-        !newEmail.includes("@") ||
-        !newEmail.includes(".")
-      ) {
-        return res.status(400).json({ error: "New email is invalid" });
-      }
-    }
-
-    if (newPassword) {
-      if (checkOnlyNumbers(newPassword) == false || newPassword.length != 4) {
-        return res.status(400).json({
-          error: "The new password need to be 4 numbers and the type is string",
-        });
-      }
+    if (cTkRes.access == false) {
+      return res.status(cTkRes.status).json({ error: cTkRes.message });
     }
 
     const userFound = await usersList.findById(id);
 
-    if (!userFound[0]) {
-      return res.status(400).json({ error: "User not found" });
-    }
-
-    const checkTokenResponse = await checkToken(id, token);
-
-    if (checkTokenResponse == false) {
-      return res.status(403).json({ error: "Aceess denied" });
-    }
-
     const checkPassword = await bcrypt.compareSync(
       password,
-      userFound[0].passwordHash
+      userFound.passwordHash
     );
 
     if (!checkPassword) {
       return res.status(403).json({ error: "Password is invalid" });
     }
 
-    const hash = () => {
-      if (newPassword) {
-        return bcrypt.hashSync(newPassword, 10);
-      } else {
-        return bcrypt.hashSync(password, 10);
-      }
-    };
+    if (newEmail) {
+      const checkAlreadyExists = await usersList.exists({ email: newEmail });
 
+      if (checkAlreadyExists) {
+        return res.status(400).json({ error: "New e-mail already exists" });
+      }
+    }
+
+    const hash = bcrypt.hashSync(newPassword || password, 10);
     const userUpdated = await usersList.findByIdAndUpdate(
       id,
       {
-        name: newName,
-        email: newEmail,
+        name: newName || userFound.name,
+        email: newEmail || userFound.email,
+        password: "0000",
         passwordHash: hash,
+        token: token,
       },
       {
         new: true,

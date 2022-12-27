@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const usersList = require("../schemas/usersList");
+const usersList = require("../lists/users");
 const bcrypt = require("bcrypt");
 const randomToken = require("random-token");
 

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const tasksList = require("../schemas/tasksList");
+const tasksList = require("../lists/tasks");
+const usersList = require("../lists/users");
 const checkToken = require("../checkToken");
 
 router.get("/", async (req, res) => {
@@ -51,49 +52,58 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+  const { user_id, name, initialDate, finalDate, description, checked } =
+    req.body;
+  const token = req.headers.token;
+
   try {
-    const { user_id, name, initialDate, finalDate, description, checked } =
-      req.body;
-    const token = req.headers.token;
+    await usersList.validate({ _id: user_id });
+    await tasksList.validate({
+      user_id: user_id,
+      name: name,
+      initialDate: initialDate,
+      finalDate: finalDate,
+      description: description,
+      checked: checked,
+    });
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
 
-    if (
-      !user_id ||
-      !name ||
-      !initialDate ||
-      !finalDate ||
-      !description ||
-      !checked
-    ) {
-      return res.status(400).json({ error: "Missing information on body" });
-    }
+  if (!token) {
+    return res.status(400).json({ error: "Token is missing" });
+  }
 
-    if (!token) {
-      return res.status(400).json({ error: "Token is missing" });
-    }
+  const userExists = await usersList.exists({ _id: user_id });
 
-    if (checked != "true" && checked != "false") {
-      return res.status(400).json({ error: "Checked is boolean" });
-    }
+  if (!userExists) {
+    return res.status(404).json({ error: "User not found" });
+  }
 
-    const checkTokenResponse = await checkToken(user_id, token);
+  const userFoundWithToken = await usersList.find({ token: token });
 
-    if (checkTokenResponse == false) {
-      return res.status(403).json({ error: "Aceess denied" });
-    }
+  if (!userFoundWithToken[0]) {
+    return res.status(404).json({ error: "Token not found" });
+  }
 
-    let initialDateTest = new Date(req.body.initialDate);
-    let finalDateTest = new Date(req.body.finalDate);
+  if (user_id != userFoundWithToken[0].id) {
+    return res.status(403).json({ error: "Token is invalid" });
+  }
 
-    if (initialDateTest > finalDateTest) {
-      return res
-        .status(400)
-        .json({ error: "Final date must be greater than start date" });
-    }
+  let initialDateTest = new Date(req.body.initialDate);
+  let finalDateTest = new Date(req.body.finalDate);
 
-    if (initialDateTest.getDate() != finalDateTest.getDate()) {
-      return res.status(400).json({ error: "The task overcomming the day" });
-    }
+  if (initialDateTest > finalDateTest) {
+    return res
+      .status(400)
+      .json({ error: "Final date must be greater than start date" });
+  }
 
+  if (initialDateTest.getDate() != finalDateTest.getDate()) {
+    return res.status(400).json({ error: "The task overcomming the day" });
+  }
+
+  try {
     const newTask = await tasksList.create({
       user_id: user_id,
       name: name,
@@ -127,9 +137,15 @@ router.delete("/:id", async (req, res) => {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
+    const taskExists = await tasksList.exists({ _id: id });
+
+    if (!taskExists) {
+      return res.status(400).json({ error: "Task does not exist" });
+    }
+
     const taskFound = await tasksList.findById(id);
 
-    if (taskFound[0].user_id != userFound[0].id) {
+    if (taskFound.user_id != user_id) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
@@ -165,9 +181,15 @@ router.put("/:id", async (req, res) => {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
+    const taskExists = await tasksList.exists({ _id: id });
+
+    if (!taskExists) {
+      return res.status(400).json({ error: "Task does not exist" });
+    }
+
     const taskFound = await tasksList.findById(id);
 
-    if (taskFound[0].user_id != userFound[0].id) {
+    if (taskFound.user_id != user_id) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
