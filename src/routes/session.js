@@ -2,6 +2,32 @@ const express = require("express");
 const router = express.Router();
 const sessionsList = require("../lists/sessions");
 
+router.get("/", async (req, res) => {
+  const session_id = req.headers.session_id;
+  const user_id = req.headers.user_id;
+
+  try {
+    await sessionsList.validate({
+      _id: session_id,
+      user_id: user_id,
+    });
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+
+  const sessionFound = await sessionsList.findById(session_id);
+
+  if (!sessionFound) {
+    res.status(404).json({ error: "Session not found" });
+  }
+
+  if (sessionFound.user_id != user_id) {
+    res.status(403).json({ error: "Session is invalid" });
+  }
+
+  res.status(200).json(sessionFound);
+});
+
 router.delete("/logout/:id", async (req, res) => {
   const id = req.params.id;
   const email = req.headers.email;
