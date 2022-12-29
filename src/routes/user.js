@@ -41,7 +41,8 @@ router.get("/sessions/:id", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const { email, password } = req.body;
+  const email = req.query.email;
+  const password = req.headers.password;
 
   try {
     await usersList.validate({
