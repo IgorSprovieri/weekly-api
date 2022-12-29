@@ -4,16 +4,15 @@ const usersList = require("../lists/users");
 const sessionsList = require("../lists/sessions");
 
 router.get("/", async (req, res) => {
-  const session_id = req.headers.session_id;
-  const user_id = req.headers.user_id;
-
-  if (!session_id || !user_id) {
-    return res
-      .status(400)
-      .json({ error: "Session id and user id is required" });
-  }
-
   try {
+    const session_id = req.headers.session_id;
+    const user_id = req.headers.user_id;
+    if (!session_id || !user_id) {
+      return res
+        .status(400)
+        .json({ error: "Session id and user id is required" });
+    }
+
     await sessionsList.validate({
       _id: session_id,
       user_id: user_id,
@@ -75,7 +74,7 @@ router.delete("/logout/:id", async (req, res) => {
       return res.status(403).json({ error: "Acces denied" });
     }
   } catch (error) {
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(400).json({ error });
   }
 
   try {
