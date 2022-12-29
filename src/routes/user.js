@@ -101,15 +101,15 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error });
   }
 
-  const alreadyExists = await usersList.exists({ email: email });
-
-  if (alreadyExists) {
-    return res.status(400).json({ error: "User already exists" });
-  }
-
-  const hash = bcrypt.hashSync(password, 10);
-
   try {
+    const alreadyExists = await usersList.exists({ email: email });
+
+    if (alreadyExists) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
+    const hash = bcrypt.hashSync(password, 10);
+
     const newUser = await usersList.create({
       name: name,
       email: email,

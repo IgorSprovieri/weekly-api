@@ -84,6 +84,7 @@ router.delete("/color/:id", async (req, res) => {
   } catch (error) {
     return res.status(400).json({ error: "id is invalid" });
   }
+
   try {
     const deletedColor = await appColorsList.findByIdAndDelete(id);
 

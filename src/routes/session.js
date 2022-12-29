@@ -6,6 +6,10 @@ router.get("/", async (req, res) => {
   const session_id = req.headers.session_id;
   const user_id = req.headers.user_id;
 
+  if (!session_id) {
+    res.status(400).json({ error: "Session id is required" });
+  }
+
   try {
     await sessionsList.validate({
       _id: session_id,
@@ -15,17 +19,21 @@ router.get("/", async (req, res) => {
     return res.status(400).json(error);
   }
 
-  const sessionFound = await sessionsList.findById(session_id);
+  try {
+    const sessionFound = await sessionsList.findById(session_id);
 
-  if (!sessionFound) {
-    res.status(404).json({ error: "Session not found" });
+    if (!sessionFound) {
+      res.status(404).json({ error: "Session not found" });
+    }
+
+    if (sessionFound.user_id != user_id) {
+      res.status(403).json({ error: "Session is invalid" });
+    }
+
+    res.status(200).json(sessionFound);
+  } catch (error) {
+    return res.status(500).json(error);
   }
-
-  if (sessionFound.user_id != user_id) {
-    res.status(403).json({ error: "Session is invalid" });
-  }
-
-  res.status(200).json(sessionFound);
 });
 
 router.delete("/logout/:id", async (req, res) => {
