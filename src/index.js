@@ -5,6 +5,8 @@ const cors = require("cors");
 const taskRoutes = require("./routes/task");
 const userRoutes = require("./routes/user");
 const sessionRoutes = require("./routes/session");
+const appRoutes = require("./routes/app");
+
 const app = express();
 app.use(express.json());
 app.use(
@@ -31,5 +33,6 @@ app.listen(port, () => {
   app.use("/task", taskRoutes);
   app.use("/user", userRoutes);
   app.use("/session", sessionRoutes);
+  app.use("/app", appRoutes);
   console.log(`App listening on port ${port}`);
 });

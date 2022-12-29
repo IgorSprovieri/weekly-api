@@ -137,7 +137,7 @@ router.put("/:id", async (req, res) => {
       {
         name: newName || userFound.name,
         email: newEmail || userFound.email,
-        password: "0000",
+        password: "xxxxxxxxxx",
         passwordHash: hash,
         token: token,
       },

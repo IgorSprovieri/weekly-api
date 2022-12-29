@@ -8,6 +8,35 @@ function checkOnlyNumbers(str) {
   return /^\d+$/.test(str);
 }
 
+router.get("/validateToken/:id", async (req, res) => {
+  try {
+    const token = req.headers.token;
+    const id = req.params.id;
+
+    if (!id || !token) {
+      return res
+        .status(400)
+        .json({ error: "Missing information: id or token" });
+    }
+
+    const userFound = await usersList.findById(id);
+
+    if (!userFound[0]) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const checkTokenResponse = await checkToken(id, token);
+
+    if (checkTokenResponse == false) {
+      return res.status(403).json({ error: "Aceess denied" });
+    }
+
+    return res.status(200).json({ token });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+});
+
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -61,7 +90,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.post("/logout/:id", async (req, res) => {
+router.delete("/logout/:id", async (req, res) => {
   try {
     const token = req.headers.token;
     const id = req.params.id;
