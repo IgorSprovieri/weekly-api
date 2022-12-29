@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const usersList = require("../lists/users");
 const sessionsList = require("../lists/sessions");
 
 router.get("/", async (req, res) => {
@@ -18,7 +19,7 @@ router.get("/", async (req, res) => {
       user_id: user_id,
     });
   } catch (error) {
-    return res.status(400).json(error);
+    return res.status(400).json({ error });
   }
 
   try {
@@ -34,7 +35,7 @@ router.get("/", async (req, res) => {
 
     res.status(200).json(sessionFound);
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({ error });
   }
 });
 
@@ -54,14 +55,14 @@ router.delete("/logout/:id", async (req, res) => {
       user_id: user_id,
     });
   } catch (error) {
-    return res.status(400).json(error);
+    return res.status(400).json({ error });
   }
 
   try {
-    const alreadyExists = await usersList.exists({ _id: user_id });
+    const userExists = await usersList.exists({ _id: user_id });
 
-    if (alreadyExists) {
-      return res.status(400).json({ error: "User already exists" });
+    if (!userExists) {
+      return res.status(404).json({ error: "User not found" });
     }
 
     const sessionFound = await sessionsList.findById(session_id);
@@ -74,7 +75,7 @@ router.delete("/logout/:id", async (req, res) => {
       return res.status(403).json({ error: "Acces denied" });
     }
   } catch (error) {
-    return res.status(400).json(error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 
   try {
