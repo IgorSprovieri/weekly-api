@@ -39,25 +39,32 @@ router.get("/", async (req, res) => {
 });
 
 router.delete("/logout/:id", async (req, res) => {
-  const id = req.params.id;
+  const session_id = req.params.id;
   const user_id = req.headers.user_id;
 
-  if (!id) {
-    return res.status(400).json({ error: "Id is mandatory" });
-  }
-
-  if (!user_id) {
-    return res.status(400).json({ error: "User email is mandatory" });
+  if (!session_id || !user_id) {
+    return res
+      .status(400)
+      .json({ error: "Session id and user id is required" });
   }
 
   try {
-    const userFound = await usersList.findById(user_id);
+    await sessionsList.validate({
+      _id: session_id,
+      user_id: user_id,
+    });
+  } catch (error) {
+    return res.status(400).json(error);
+  }
 
-    if (!userFound) {
-      return res.status(404).json({ error: "User not found" });
+  try {
+    const alreadyExists = await usersList.exists({ _id: user_id });
+
+    if (alreadyExists) {
+      return res.status(400).json({ error: "User already exists" });
     }
 
-    const sessionFound = await sessionsList.findById(id);
+    const sessionFound = await sessionsList.findById(session_id);
 
     if (!sessionFound) {
       return res.status(404).json({ error: "Session not found" });
@@ -71,7 +78,7 @@ router.delete("/logout/:id", async (req, res) => {
   }
 
   try {
-    await sessionsList.findByIdAndDelete(id);
+    await sessionsList.findByIdAndDelete(session_id);
 
     return res.status(200).json({ success: "logout completed" });
   } catch (error) {
