@@ -72,7 +72,7 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    const userExists = await usersList.exists({ _id: id });
+    const userExists = await usersList.exists({ _id: user_id });
 
     if (!userExists) {
       return res.status(404).json({ error: "User not found" });

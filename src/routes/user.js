@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 
 router.get("/sessions/:id", async (req, res) => {
   const id = req.params.id;
-  const email = req.params.email;
+  const email = req.headers.email;
 
   if (!id) {
     return res.status(400).json({ error: "Id is mandatory" });
@@ -20,12 +20,12 @@ router.get("/sessions/:id", async (req, res) => {
   try {
     const userFound = await usersList.find({ email: email });
 
-    if (!userFound) {
+    if (!userFound[0]) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    if (userFound._id != id) {
-      return res.status(403).json({ error: "Acces denied" });
+    if (userFound[0]._id != id) {
+      return res.status(403).json({ error: "Access denied" });
     }
   } catch (error) {
     return res.status(400).json(error);
@@ -72,7 +72,12 @@ router.get("/", async (req, res) => {
       user_id: userFound[0]._id,
     });
 
-    return res.status(200).json(userFound[0] + sessionCreated);
+    return res.status(200).json({
+      user_id: userFound[0]._id,
+      name: userFound[0].name,
+      email: userFound[0].email,
+      session_id: sessionCreated._id,
+    });
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -107,11 +112,20 @@ router.post("/", async (req, res) => {
     const newUser = await usersList.create({
       name: name,
       email: email,
-      password: "xxxx",
+      password: "0000",
       passwordHash: hash,
     });
 
-    return res.status(200).json(newUser);
+    const sessionCreated = await sessionsList.create({
+      user_id: newUser._id,
+    });
+
+    return res.status(200).json({
+      user_id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      session_id: sessionCreated._id,
+    });
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -221,7 +235,7 @@ router.put("/:id", async (req, res) => {
       {
         name: newName,
         email: newEmail,
-        password: "xxxx",
+        password: "0000",
         passwordHash: hash,
       },
       {
@@ -229,7 +243,11 @@ router.put("/:id", async (req, res) => {
       }
     );
 
-    return res.status(200).json(userUpdated);
+    return res.status(200).json({
+      user_id: userUpdated._id,
+      name: userUpdated.name,
+      email: userUpdated.email,
+    });
   } catch (error) {
     return res.status(500).json({ error });
   }
