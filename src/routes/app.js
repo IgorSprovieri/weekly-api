@@ -34,6 +34,40 @@ router.post("/color", async (req, res) => {
   }
 });
 
+router.put("/color/:id", async (req, res) => {
+  const id = req.params.id;
+  const newColor = req.body.color;
+
+  if (!id) {
+    return res.status(400).json({ error: "id is mandatory" });
+  }
+
+  try {
+    await appColorsList.validate({
+      _id: id,
+      hexColor: newColor,
+    });
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+
+  const colorExists = await appColorsList.findById(id);
+
+  if (!colorExists[0]) {
+    return res.status(404).json({ error: "id not found" });
+  }
+
+  try {
+    const updatedColor = await appColorsList.findByIdAndUpdate(id, {
+      color: newColor,
+    });
+
+    return res.status(200).json(updatedColor);
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+});
+
 router.delete("/color/:id", async (req, res) => {
   const id = req.params.id;
 
