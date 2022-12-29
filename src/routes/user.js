@@ -132,7 +132,8 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-  const { email, password } = req.body;
+  const email = req.headers.email;
+  const password = req.body.password;
   const id = req.params.id;
 
   if (!id) {
@@ -179,7 +180,8 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
-  const { newName, newEmail, newPassword, email, password } = req.body;
+  const email = req.headers.email;
+  const { newName, newEmail, newPassword, password } = req.body;
   const id = req.params.id;
 
   if (!id) {
