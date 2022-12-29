@@ -41,7 +41,7 @@ router.get("/sessions/:id", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const email = req.query.email;
+  const email = req.headers.email;
   const password = req.headers.password;
 
   try {
