@@ -72,7 +72,7 @@ router.delete("/color/:id", async (req, res) => {
   const id = req.params.id;
 
   if (!id) {
-    return res.status(400).json({ error: "id is mandatory" });
+    return res.status(400).json({ error: "Id is mandatory" });
   }
 
   try {

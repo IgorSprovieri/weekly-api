@@ -32,14 +32,10 @@ const usersListSchema = new mongoose.Schema({
     validate: [validatePassword, "invalid"],
     minlength: 4,
     maxlength: 4,
+    default: "xxxx",
   },
   passwordHash: {
     type: String,
-    required: [true, "is required"],
-  },
-  token: {
-    type: String,
-    required: [true, "is required"],
   },
 });
 
