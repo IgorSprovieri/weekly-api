@@ -6,8 +6,10 @@ router.get("/", async (req, res) => {
   const session_id = req.headers.session_id;
   const user_id = req.headers.user_id;
 
-  if (!session_id) {
-    res.status(400).json({ error: "Session id is required" });
+  if (!session_id || !user_id) {
+    return res
+      .status(400)
+      .json({ error: "Session id and user id is required" });
   }
 
   try {
