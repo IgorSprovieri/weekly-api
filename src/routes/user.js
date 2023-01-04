@@ -1,37 +1,34 @@
 const express = require("express");
 const router = express.Router();
-const usersList = require("../lists/users");
-const tasksList = require("../lists/tasks");
-const sessionsList = require("../lists/sessions");
+const validation = require("../validation");
+const usersList = require("../models/users");
+const tasksList = require("../models/tasks");
+const sessionsList = require("../models/sessions");
 const bcrypt = require("bcrypt");
 
 router.get("/sessions/:id", async (req, res) => {
-  const id = req.params.id;
-  const email = req.headers.email;
-
-  if (!id) {
-    return res.status(400).json({ error: "Id is mandatory" });
-  }
-
-  if (!email) {
-    return res.status(400).json({ error: "User email is mandatory" });
-  }
-
   try {
-    const userFound = await usersList.find({ email: email });
+    const id = req.params.id;
+    const currentEmail = req.headers.email;
+
+    if (!id || !validation.validateIdObject(id)) {
+      return res.status(400).json({ error: "Id is invalid" });
+    }
+
+    if (!currentEmail || !validation.validateEmail(currentEmail)) {
+      return res.status(400).json({ error: "E-mail is invalid" });
+    }
+
+    const userFound = usersList.find({ email: currentEmail });
 
     if (!userFound[0]) {
-      return res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: "User not found" });
     }
 
-    if (userFound[0]._id != id) {
+    if (!id.equals(userFound[0]._id)) {
       return res.status(403).json({ error: "Access denied" });
     }
-  } catch (error) {
-    return res.status(400).json({ error });
-  }
 
-  try {
     const sessions = await sessionsList.find({ user_id: id });
 
     return res.status(200).json(sessions);
@@ -41,19 +38,19 @@ router.get("/sessions/:id", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const email = req.headers.email;
-  const password = req.headers.password;
-
   try {
-    await usersList.validate({
-      email: email,
-      password: password,
-    });
-  } catch (error) {
-    return res.status(400).json({ error });
-  }
+    const email = req.query.email;
+    const password = req.query.password;
+    const deviceName = req.header.deviceName;
 
-  try {
+    if (!email || !validation.validateEmail(email)) {
+      return res.status(400).json({ error: "E-mail is invalid" });
+    }
+
+    if (!password || !validation.validatePassword(password)) {
+      return res.status(400).json({ error: "Password is invalid" });
+    }
+
     const userFound = await usersList.find({ email: email });
 
     if (!userFound[0]) {
@@ -71,13 +68,17 @@ router.get("/", async (req, res) => {
 
     const sessionCreated = await sessionsList.create({
       user_id: userFound[0]._id,
+      name: deviceName,
+      createdOn: new Date(),
     });
 
     return res.status(200).json({
       user_id: userFound[0]._id,
       name: userFound[0].name,
       email: userFound[0].email,
+      session_createdOn: sessionCreated.createdOn,
       session_id: sessionCreated._id,
+      session_device: sessionCreated.name,
     });
   } catch (error) {
     return res.status(500).json({ error });
@@ -85,23 +86,22 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { name, email, password } = req.body;
-
-  if (name.length < 3) {
-    return res.status(400).json({ error: "Name is required" });
-  }
-
   try {
-    await usersList.validate({
-      name: name,
-      email: email,
-      password: password,
-    });
-  } catch (error) {
-    return res.status(400).json({ error });
-  }
+    const { name, email, password } = req.body;
+    const deviceName = req.header.deviceName;
 
-  try {
+    if (!name) {
+      return res.status(400).json({ error: "Name is required" });
+    }
+
+    if (!email || !validation.validateEmail(email)) {
+      return res.status(400).json({ error: "E-mail is invalid" });
+    }
+
+    if (!password || !validation.validatePassword(password)) {
+      return res.status(400).json({ error: "Password is invalid" });
+    }
+
     const alreadyExists = await usersList.exists({ email: email });
 
     if (alreadyExists) {
@@ -113,19 +113,22 @@ router.post("/", async (req, res) => {
     const newUser = await usersList.create({
       name: name,
       email: email,
-      password: "0000",
       passwordHash: hash,
     });
 
     const sessionCreated = await sessionsList.create({
       user_id: newUser._id,
+      name: deviceName,
+      createdOn: new Date(),
     });
 
     return res.status(200).json({
       user_id: newUser._id,
       name: newUser.name,
       email: newUser.email,
+      session_createdOn: sessionCreated.createdOn,
       session_id: sessionCreated._id,
+      session_device: sessionCreated.name,
     });
   } catch (error) {
     return res.status(500).json({ error });
@@ -133,37 +136,36 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-  const email = req.headers.email;
-  const password = req.body.password;
-  const id = req.params.id;
-
-  if (!id) {
-    return res.status(400).json({ error: "Id is mandatory" });
-  }
-
   try {
-    await usersList.validate({
-      _id: id,
-      email: email,
-      password: password,
-    });
-  } catch (error) {
-    return res.status(400).json({ error });
-  }
+    const currentEmail = req.headers.email;
+    const password = req.query.password;
+    const id = req.params.id;
 
-  try {
-    const userFound = await usersList.findById(id);
+    if (!id || !validation.validateIdObject(id)) {
+      return res.status(400).json({ error: "Id is invalid" });
+    }
 
-    if (!userFound) {
+    if (!currentEmail || !validation.validateEmail(currentEmail)) {
+      return res.status(400).json({ error: "E-mail is invalid" });
+    }
+
+    if (!password || !validation.validatePassword(password)) {
+      return res.status(400).json({ error: "Password is invalid" });
+    }
+
+    const userFound = await usersList.find({ email: currentEmail });
+
+    if (!userFound[0]) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    if (userFound.email != email) {
-      return res.status(403).json({ error: "Email is invalid" });
+    if (!id.equals(userFound[0]._id)) {
+      return res.status(403).json({ error: "Id is invalid" });
     }
+
     const checkPassword = await bcrypt.compareSync(
       password,
-      userFound.passwordHash
+      userFound[0].passwordHash
     );
 
     if (!checkPassword) {
@@ -181,50 +183,25 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
-  const email = req.headers.email;
-  const { newName, newEmail, newPassword, password } = req.body;
-  const id = req.params.id;
-
-  if (!id) {
-    return res.status(400).json({ error: "Id is mandatory" });
-  }
-
   try {
-    await usersList.validate({
-      _id: id,
-      email: email,
-      password: password,
-    });
-    await usersList.validate({
-      name: newName,
-      email: newEmail || email,
-      password: newPassword || password,
-    });
-  } catch (error) {
-    return res.status(400).json({ error });
-  }
+    const currentEmail = req.headers.email;
+    const id = req.params.id;
+    const password = req.query.password;
+    const { newName, newEmail } = req.body;
 
-  try {
-    const userFound = await usersList.findById(id);
-
-    if (!userFound) {
-      return res.status(404).json({ error: "User not found" });
+    if (!id || !validation.validateIdObject(id)) {
+      return res.status(400).json({ error: "Id is invalid" });
     }
 
-    if (userFound.email != email) {
-      return res.status(403).json({ error: "Email is invalid" });
-    }
-
-    const checkPassword = await bcrypt.compareSync(
-      password,
-      userFound.passwordHash
-    );
-
-    if (!checkPassword) {
-      return res.status(403).json({ error: "Password is invalid" });
+    if (!currentEmail || !validation.validateEmail(currentEmail)) {
+      return res.status(400).json({ error: "E-mail is invalid" });
     }
 
     if (newEmail) {
+      if (!validation.validateEmail(newEmail)) {
+        return res.status(400).json({ error: "New e-mail is invalid" });
+      }
+
       const alreadyExists = await usersList.exists({ email: newEmail });
 
       if (alreadyExists) {
@@ -232,14 +209,30 @@ router.put("/:id", async (req, res) => {
       }
     }
 
-    const hash = bcrypt.hashSync(newPassword || password, 10);
+    const userFound = await usersList.find({ email: currentEmail });
+
+    if (!userFound[0]) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (!id.equals(userFound[0]._id)) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const checkPassword = await bcrypt.compareSync(
+      password,
+      userFound[0].passwordHash
+    );
+
+    if (!checkPassword) {
+      return res.status(403).json({ error: "Password is invalid" });
+    }
+
     const userUpdated = await usersList.findByIdAndUpdate(
       id,
       {
         name: newName,
         email: newEmail,
-        password: "0000",
-        passwordHash: hash,
       },
       {
         new: true,

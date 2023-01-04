@@ -1,29 +1,34 @@
 const express = require("express");
 const router = express.Router();
+const validation = require("../validation");
 const tasksList = require("../lists/tasks");
 const usersList = require("../lists/users");
 
 router.get("/", async (req, res) => {
-  const user_id = req.headers.user_id;
-  const { initialDate, finalDate } = req.body;
-  let initialDateTest = new Date(initialDate);
-  let finalDateTest = new Date(finalDate);
-
-  if (!user_id) {
-    return res.status(400).json({ error: "User id is mandatory" });
-  }
-
   try {
-    await tasksList.validate({
-      user_id: user_id,
-      initialDate: initialDate,
-      finalDate: finalDate,
-    });
-  } catch (error) {
-    return res.status(400).json({ error });
-  }
+    const currentEmail = req.headers.email;
+    const { initialDate, finalDate } = req.body;
+    let initialDateTest = new Date(initialDate);
+    let finalDateTest = new Date(finalDate);
 
-  try {
+    if (!currentEmail || !validation.validateEmail(currentEmail)) {
+      return res.status(400).json({ error: "E-mail is invalid" });
+    }
+
+    if (!initialDate || !validation.validateDate(initialDate)) {
+      return res.status(400).json({ error: "Initial date is invalid" });
+    }
+
+    if (!finalDate || !validation.validateDate(finalDate)) {
+      return res.status(400).json({ error: "Final date is invalid" });
+    }
+
+    const userFound = usersList.find({ email: currentEmail });
+
+    if (!userFound[0]) {
+      res.status(404).json({ error: "User not found" });
+    }
+
     if (initialDateTest.getDate() > finalDateTest.getDate()) {
       return res
         .status(400)
@@ -32,7 +37,7 @@ router.get("/", async (req, res) => {
 
     const tasks = await tasksList
       .find({
-        user_id: user_id,
+        user_id: userFound[0]._id,
         initialDate: {
           $gte: initialDate,
           $lt: finalDate,
@@ -51,31 +56,32 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const user_id = req.headers.user_id;
-  const { name, initialDate, finalDate, description, checked } = req.body;
-
-  if (!user_id) {
-    return res.status(400).json({ error: "User id is mandatory" });
-  }
-
   try {
-    await tasksList.validate({
-      user_id: user_id,
-      name: name,
-      initialDate: initialDate,
-      finalDate: finalDate,
-      description: description,
-      checked: checked,
-    });
-  } catch (error) {
-    return res.status(400).json({ error });
-  }
+    const currentEmail = req.headers.email;
+    const { name, initialDate, finalDate, description, checked } = req.body;
 
-  try {
-    const userExists = await usersList.exists({ _id: user_id });
+    if (!currentEmail || !validation.validateEmail(currentEmail)) {
+      return res.status(400).json({ error: "E-mail is invalid" });
+    }
 
-    if (!userExists) {
-      return res.status(404).json({ error: "User not found" });
+    if (!initialDate || !validation.validateDate(initialDate)) {
+      return res.status(400).json({ error: "Initial date is invalid" });
+    }
+
+    if (!finalDate || !validation.validateDate(finalDate)) {
+      return res.status(400).json({ error: "Final date is invalid" });
+    }
+
+    if (checked) {
+      if (!validation.validateBool(checked)) {
+        return res.status(400).json({ error: "Final date is invalid" });
+      }
+    }
+
+    const userFound = usersList.find({ email: currentEmail });
+
+    if (!userFound[0]) {
+      res.status(404).json({ error: "User not found" });
     }
 
     let initialDateTest = new Date(req.body.initialDate);
@@ -92,7 +98,7 @@ router.post("/", async (req, res) => {
     }
 
     const newTask = await tasksList.create({
-      user_id: user_id,
+      user_id: userFound[0]._id,
       name: name,
       initialDate: initialDate,
       finalDate: finalDate,
@@ -107,36 +113,25 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-  const user_id = req.headers.user_id;
-  const id = req.params.id;
-
-  if (!id) {
-    return res.status(400).json({ error: "Id is mandatory" });
-  }
-
-  if (!user_id) {
-    return res.status(400).json({ error: "User id is mandatory" });
-  }
-
   try {
-    await tasksList.validate({
-      _id: id,
-      user_id: user_id,
-      initialDate: new Date(),
-      finalDate: new Date(),
-    });
-  } catch (error) {
-    return res.status(400).json({ error });
-  }
+    const id = req.params.id;
+    const currentEmail = req.headers.email;
 
-  try {
+    if (!id || !validation.validateIdObject(id)) {
+      return res.status(400).json({ error: "Id is invalid" });
+    }
+
+    if (!currentEmail || !validation.validateEmail(currentEmail)) {
+      return res.status(400).json({ error: "E-mail is invalid" });
+    }
+
     const taskFound = await tasksList.findById(id);
 
     if (!taskFound) {
       return res.status(404).json({ error: "Task not found" });
     }
 
-    if (taskFound.user_id != user_id) {
+    if (!taskFound.user_id.equals(userFound[0]._id)) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 
@@ -148,36 +143,54 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
-  const { name, initialDate, finalDate, description, checked } = req.body;
-  const id = req.params.id;
-  const user_id = req.headers.user_id;
-
-  if (!user_id) {
-    return res.status(400).json({ error: "User id is mandatory" });
-  }
-
   try {
-    await tasksList.validate({
-      _id: id,
-      user_id: user_id,
-      name: name,
-      initialDate: initialDate || new Date(),
-      finalDate: finalDate || new Date(),
-      description: description,
-      checked: checked,
-    });
-  } catch (error) {
-    return res.status(400).json({ error });
-  }
+    const { name, initialDate, finalDate, description, checked } = req.body;
+    const id = req.params.id;
+    const currentEmail = req.headers.email;
 
-  try {
+    if (!id || !validation.validateIdObject(id)) {
+      return res.status(400).json({ error: "Id is invalid" });
+    }
+
+    if (!currentEmail || !validation.validateEmail(currentEmail)) {
+      return res.status(400).json({ error: "E-mail is invalid" });
+    }
+
+    if (!currentEmail || !validation.validateEmail(currentEmail)) {
+      return res.status(400).json({ error: "E-mail is invalid" });
+    }
+
+    if (initialDate) {
+      if (!initialDate || !validation.validateDate(initialDate)) {
+        return res.status(400).json({ error: "Initial date is invalid" });
+      }
+    }
+
+    if (finalDate) {
+      if (!validation.validateDate(finalDate)) {
+        return res.status(400).json({ error: "Final date is invalid" });
+      }
+    }
+
+    if (checked) {
+      if (!validation.validateBool(checked)) {
+        return res.status(400).json({ error: "Final date is invalid" });
+      }
+    }
+
+    const userFound = usersList.find({ email: currentEmail });
+
+    if (!userFound[0]) {
+      res.status(404).json({ error: "User not found" });
+    }
+
     const taskFound = await tasksList.findById(id);
 
     if (!taskFound) {
       return res.status(404).json({ error: "Task not found" });
     }
 
-    if (taskFound.user_id != user_id) {
+    if (!taskFound.user_id.equals(userFound[0]._id)) {
       return res.status(403).json({ error: "Aceess denied" });
     }
 

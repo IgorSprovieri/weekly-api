@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const appColorsList = require("../lists/colors");
+const appColorsList = require("../models/colors");
+const validation = require("../validation");
 
 router.get("/colors", async (req, res) => {
   try {
@@ -13,17 +14,13 @@ router.get("/colors", async (req, res) => {
 });
 
 router.post("/color", async (req, res) => {
-  const color = req.body.color;
-
   try {
-    await appColorsList.validate({
-      hexColor: color,
-    });
-  } catch (error) {
-    return res.status(400).json(error);
-  }
+    const color = req.body.color;
 
-  try {
+    if (!color || !validation.validateHexColor(color)) {
+      return res.status(400).json({ error: "Invalid hex color" });
+    }
+
     const newColor = await appColorsList.create({
       hexColor: color,
     });
@@ -35,29 +32,24 @@ router.post("/color", async (req, res) => {
 });
 
 router.put("/color/:id", async (req, res) => {
-  const id = req.params.id;
-  const newColor = req.body.color;
-
-  if (!id) {
-    return res.status(400).json({ error: "id is mandatory" });
-  }
-
   try {
-    await appColorsList.validate({
-      _id: id,
-      hexColor: newColor,
-    });
-  } catch (error) {
-    return res.status(400).json(error);
-  }
+    const id = req.params.id;
+    const newColor = req.body.color;
 
-  const colorExists = await appColorsList.findById(id);
+    if (!validation.validateIdObject(id)) {
+      return res.status(400).json({ error: "Invalid id" });
+    }
 
-  if (!colorExists[0]) {
-    return res.status(404).json({ error: "id not found" });
-  }
+    if (!newColor || !validation.validateHexColor(newColor)) {
+      return res.status(400).json({ error: "Invalid hex color" });
+    }
 
-  try {
+    const colorExists = await appColorsList.findById(id);
+
+    if (!colorExists) {
+      return res.status(404).json({ error: "Id not found" });
+    }
+
     const updatedColor = await appColorsList.findByIdAndUpdate(id, {
       color: newColor,
     });
@@ -69,23 +61,19 @@ router.put("/color/:id", async (req, res) => {
 });
 
 router.delete("/color/:id", async (req, res) => {
-  const id = req.params.id;
-
-  if (!id) {
-    return res.status(400).json({ error: "Id is mandatory" });
-  }
-
   try {
+    const id = req.params.id;
+
+    if (!validation.validateIdObject(id)) {
+      return res.status(400).json({ error: "Invalid id" });
+    }
+
     const colorExists = await appColorsList.findById(id);
 
-    if (!colorExists[0]) {
-      return res.status(404).json({ error: "id not found" });
+    if (!colorExists) {
+      return res.status(404).json({ error: "Id not found" });
     }
-  } catch (error) {
-    return res.status(400).json({ error: "id is invalid" });
-  }
 
-  try {
     const deletedColor = await appColorsList.findByIdAndDelete(id);
 
     return res.status(200).json(deletedColor);

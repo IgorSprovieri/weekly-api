@@ -1,84 +1,75 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
-const usersList = require("../lists/users");
-const sessionsList = require("../lists/sessions");
+const validation = require("../validation");
+const usersList = require("../models/users");
+const sessionsList = require("../models/sessions");
 
-router.get("/", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
-    const session_id = req.headers.session_id;
-    const user_id = req.headers.user_id;
-    if (!session_id || !user_id) {
-      return res
-        .status(400)
-        .json({ error: "Session id and user id is required" });
+    const id = req.params.id;
+    const currentEmail = req.headers.email;
+
+    if (!validation.validateIdObject(id)) {
+      return res.status(400).json({ error: "Id is invalid" });
     }
 
-    await sessionsList.validate({
-      _id: session_id,
-      user_id: user_id,
-    });
-  } catch (error) {
-    return res.status(400).json({ error });
-  }
+    if (!validation.validateEmail(currentEmail)) {
+      return res.status(400).json({ error: "E-mail is invalid" });
+    }
 
-  try {
-    const sessionFound = await sessionsList.findById(session_id);
+    const userFound = await usersList.find({ email: currentEmail });
+
+    if (!userFound[0]) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const sessionFound = await sessionsList.findById(id);
 
     if (!sessionFound) {
-      res.status(404).json({ error: "Session not found" });
+      return res.status(404).json({ error: "Session not found" });
     }
 
-    if (sessionFound.user_id != user_id) {
-      res.status(403).json({ error: "Session is invalid" });
+    if (!sessionFound.user_id.equals(userFound[0]._id)) {
+      return res.status(403).json({ error: "Access denied" });
     }
 
-    res.status(200).json(sessionFound);
+    return res.status(200).json(sessionFound);
   } catch (error) {
     return res.status(500).json({ error });
   }
 });
 
 router.delete("/logout/:id", async (req, res) => {
-  const session_id = req.params.id;
-  const user_id = req.headers.user_id;
-
-  if (!session_id || !user_id) {
-    return res
-      .status(400)
-      .json({ error: "Session id and user id is required" });
-  }
-
   try {
-    await sessionsList.validate({
-      _id: session_id,
-      user_id: user_id,
-    });
-  } catch (error) {
-    return res.status(400).json({ error });
-  }
+    const id = req.params.id;
+    const currentEmail = req.headers.email;
 
-  try {
-    const userExists = await usersList.exists({ _id: user_id });
-
-    if (!userExists) {
-      return res.status(404).json({ error: "User not found" });
+    if (!validation.validateIdObject(id)) {
+      return res.status(400).json({ error: "Id is invalid" });
     }
 
-    const sessionFound = await sessionsList.findById(session_id);
+    if (!validation.validateEmail(currentEmail)) {
+      return res.status(400).json({ error: "E-mail is invalid" });
+    }
+
+    const userFound = usersList.find({ email: currentEmail });
+
+    if (!userFound[0]) {
+      res.status(404).json({ error: "User not found" });
+    }
+
+    const sessionFound = await sessionsList.findById(id);
 
     if (!sessionFound) {
       return res.status(404).json({ error: "Session not found" });
     }
 
-    if (user_id != sessionFound.user_id) {
-      return res.status(403).json({ error: "Acces denied" });
+    if (!sessionFound.user_id.equals(userFound[0]._id)) {
+      return res.status(403).json({ error: "Access denied" });
     }
-  } catch (error) {
-    return res.status(400).json({ error });
-  }
 
-  try {
-    await sessionsList.findByIdAndDelete(session_id);
+    await sessionsList.findByIdAndDelete(id);
 
     return res.status(200).json({ success: "logout completed" });
   } catch (error) {
