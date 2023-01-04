@@ -69,7 +69,20 @@ router.get("/", async (req, res) => {
     );
 
     if (!checkPassword) {
-      return res.status(403).json({ error: "Password is invalid" });
+      let loginAttempts = userFound[0].loginAttempts;
+      loginAttempts++;
+
+      await usersList.findByIdAndUpdate(userFound[0]._id, {
+        loginAttempts: loginAttempts,
+      });
+
+      if (loginAttempts < 5) {
+        return res.status(403).json({ error: "Password is invalid" });
+      } else {
+        return res
+          .status(429)
+          .json({ error: "Many requests, reset password in your e-mail" });
+      }
     }
 
     const sessionCreated = await sessionsList.create({
@@ -134,7 +147,7 @@ router.post("/", async (req, res) => {
       createdOn: new Date(),
     });
 
-    return res.status(200).json({
+    return res.status(201).json({
       user_id: newUser._id,
       name: newUser.name,
       email: newUser.email,

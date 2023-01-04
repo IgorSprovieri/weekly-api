@@ -11,6 +11,12 @@ const usersListSchema = new mongoose.Schema({
   passwordHash: {
     type: String,
   },
+  loginAttempts: {
+    Type: Number,
+  },
+  resetPasswordToken: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("users", usersListSchema);

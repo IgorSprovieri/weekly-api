@@ -10,8 +10,7 @@ const validations = {
   },
 
   validatePassword: (password) => {
-    //const regex = /^\d+$/;
-    const regex = /^\d{4}$/;
+    const regex = /^\d{6}$/;
     return regex.test(password);
   },
 
