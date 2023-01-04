@@ -50,9 +50,15 @@ router.put("/color/:id", async (req, res) => {
       return res.status(404).json({ error: "Id not found" });
     }
 
-    const updatedColor = await appColorsList.findByIdAndUpdate(id, {
-      color: newColor,
-    });
+    const updatedColor = await appColorsList.findByIdAndUpdate(
+      id,
+      {
+        hexColor: newColor,
+      },
+      {
+        new: true,
+      }
+    );
 
     return res.status(200).json(updatedColor);
   } catch (error) {

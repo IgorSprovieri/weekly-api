@@ -53,10 +53,10 @@ router.delete("/logout/:id", async (req, res) => {
       return res.status(400).json({ error: "E-mail is invalid" });
     }
 
-    const userFound = usersList.find({ email: currentEmail });
+    const userFound = await usersList.find({ email: currentEmail });
 
     if (!userFound[0]) {
-      res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
     const sessionFound = await sessionsList.findById(id);

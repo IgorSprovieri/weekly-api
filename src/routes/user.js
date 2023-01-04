@@ -19,17 +19,17 @@ router.get("/sessions/:id", async (req, res) => {
       return res.status(400).json({ error: "E-mail is invalid" });
     }
 
-    const userFound = usersList.find({ email: currentEmail });
+    const userFound = await usersList.find({ email: currentEmail });
 
     if (!userFound[0]) {
-      res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
-    if (!id.equals(userFound[0]._id)) {
+    if (!userFound[0]._id.equals(id)) {
       return res.status(403).json({ error: "Access denied" });
     }
 
-    const sessions = await sessionsList.find({ user_id: id });
+    const sessions = await sessionsList.find({ user_id: userFound[0]._id });
 
     return res.status(200).json(sessions);
   } catch (error) {
@@ -41,7 +41,7 @@ router.get("/", async (req, res) => {
   try {
     const email = req.query.email;
     const password = req.query.password;
-    const deviceName = req.header.deviceName;
+    const device = req.headers.device;
 
     if (!email || !validation.validateEmail(email)) {
       return res.status(400).json({ error: "E-mail is invalid" });
@@ -49,6 +49,12 @@ router.get("/", async (req, res) => {
 
     if (!password || !validation.validatePassword(password)) {
       return res.status(400).json({ error: "Password is invalid" });
+    }
+
+    if (!device) {
+      return res
+        .status(400)
+        .json({ error: "Device name is required to open the session" });
     }
 
     const userFound = await usersList.find({ email: email });
@@ -68,7 +74,7 @@ router.get("/", async (req, res) => {
 
     const sessionCreated = await sessionsList.create({
       user_id: userFound[0]._id,
-      name: deviceName,
+      device: device,
       createdOn: new Date(),
     });
 
@@ -78,7 +84,7 @@ router.get("/", async (req, res) => {
       email: userFound[0].email,
       session_createdOn: sessionCreated.createdOn,
       session_id: sessionCreated._id,
-      session_device: sessionCreated.name,
+      session_device: sessionCreated.device,
     });
   } catch (error) {
     return res.status(500).json({ error });
@@ -88,7 +94,7 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    const deviceName = req.header.deviceName;
+    const device = req.headers.device;
 
     if (!name) {
       return res.status(400).json({ error: "Name is required" });
@@ -100,6 +106,12 @@ router.post("/", async (req, res) => {
 
     if (!password || !validation.validatePassword(password)) {
       return res.status(400).json({ error: "Password is invalid" });
+    }
+
+    if (!device) {
+      return res
+        .status(400)
+        .json({ error: "Device name is required to open the session" });
     }
 
     const alreadyExists = await usersList.exists({ email: email });
@@ -118,7 +130,7 @@ router.post("/", async (req, res) => {
 
     const sessionCreated = await sessionsList.create({
       user_id: newUser._id,
-      name: deviceName,
+      device: device,
       createdOn: new Date(),
     });
 
@@ -128,7 +140,7 @@ router.post("/", async (req, res) => {
       email: newUser.email,
       session_createdOn: sessionCreated.createdOn,
       session_id: sessionCreated._id,
-      session_device: sessionCreated.name,
+      session_device: sessionCreated.device,
     });
   } catch (error) {
     return res.status(500).json({ error });
@@ -159,7 +171,7 @@ router.delete("/:id", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    if (!id.equals(userFound[0]._id)) {
+    if (!userFound[0]._id.equals(id)) {
       return res.status(403).json({ error: "Id is invalid" });
     }
 
@@ -215,7 +227,7 @@ router.put("/:id", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    if (!id.equals(userFound[0]._id)) {
+    if (!userFound[0]._id.equals(id)) {
       return res.status(403).json({ error: "Access denied" });
     }
 

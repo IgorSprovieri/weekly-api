@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const validation = require("../validation");
-const tasksList = require("../lists/tasks");
-const usersList = require("../lists/users");
+const tasksList = require("../models/tasks");
+const usersList = require("../models/users");
 
 router.get("/", async (req, res) => {
   try {
@@ -23,10 +23,10 @@ router.get("/", async (req, res) => {
       return res.status(400).json({ error: "Final date is invalid" });
     }
 
-    const userFound = usersList.find({ email: currentEmail });
+    const userFound = await usersList.find({ email: currentEmail });
 
     if (!userFound[0]) {
-      res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
     if (initialDateTest.getDate() > finalDateTest.getDate()) {
@@ -78,10 +78,10 @@ router.post("/", async (req, res) => {
       }
     }
 
-    const userFound = usersList.find({ email: currentEmail });
+    const userFound = await usersList.find({ email: currentEmail });
 
     if (!userFound[0]) {
-      res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
     let initialDateTest = new Date(req.body.initialDate);
@@ -123,6 +123,12 @@ router.delete("/:id", async (req, res) => {
 
     if (!currentEmail || !validation.validateEmail(currentEmail)) {
       return res.status(400).json({ error: "E-mail is invalid" });
+    }
+
+    const userFound = await usersList.find({ email: currentEmail });
+
+    if (!userFound[0]) {
+      return res.status(404).json({ error: "User not found" });
     }
 
     const taskFound = await tasksList.findById(id);
@@ -178,10 +184,10 @@ router.put("/:id", async (req, res) => {
       }
     }
 
-    const userFound = usersList.find({ email: currentEmail });
+    const userFound = await usersList.find({ email: currentEmail });
 
     if (!userFound[0]) {
-      res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
     const taskFound = await tasksList.findById(id);

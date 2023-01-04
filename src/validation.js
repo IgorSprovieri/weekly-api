@@ -16,12 +16,12 @@ const validations = {
   },
 
   validateDate: (date) => {
-    const regex = /^\d{4}-[0-1][0-2]-[0-3]\d\s([0-1][0-9]|2[0-3]):[0-5]\d$/;
+    const regex = /^(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d).(\d{3})Z$/;
     return regex.test(date);
   },
 
   validateBool: (boolString) => {
-    const regex = /^(?i:true|false)$/;
+    const regex = /true|false/;
     return regex.test(boolString);
   },
 
