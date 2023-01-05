@@ -6,6 +6,56 @@ const tasksList = require("../models/tasks");
 const sessionsList = require("../models/sessions");
 const bcrypt = require("bcrypt");
 
+router.put("/resetpassword/:secureid", async (req, res) => {
+  try {
+    const secureid = req.params.secureid;
+    const email = req.headers.email;
+    const token = req.query.token;
+    const password = req.body.password;
+
+    if (!email || !validation.validateEmail(email)) {
+      return res.status(400).json({ error: "E-mail is invalid" });
+    }
+
+    const userFound = await usersList.find({ email: email });
+
+    if (!userFound[0]) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (
+      userFound[0].resetPasswordSecureId === "null" ||
+      userFound[0].resetPasswordToken === "null"
+    ) {
+      return res.status(403).json({ error: "Aceess denied" });
+    }
+
+    if (secureid != userFound[0].resetPasswordSecureId) {
+      return res.status(403).json({ error: "Aceess denied" });
+    }
+
+    if (token != userFound[0].resetPasswordToken) {
+      await usersList.findByIdAndUpdate(userFound[0]._id, {
+        resetPasswordSecureId: "null",
+        resetPasswordToken: "null",
+      });
+      return res
+        .status(403)
+        .json({ error: "Token is invalid, restart reset password" });
+    }
+
+    const hash = bcrypt.hashSync(password, 10);
+
+    await usersList.findByIdAndUpdate(id, {
+      passwordHash: hash,
+    });
+
+    return res.status(200).json();
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+});
+
 router.get("/sessions/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -72,16 +122,22 @@ router.get("/", async (req, res) => {
       let loginAttempts = userFound[0].loginAttempts;
       loginAttempts++;
 
-      await usersList.findByIdAndUpdate(userFound[0]._id, {
-        loginAttempts: loginAttempts,
-      });
-
       if (loginAttempts < 5) {
+        await usersList.findByIdAndUpdate(userFound[0]._id, {
+          loginAttempts: loginAttempts,
+        });
         return res.status(403).json({ error: "Password is invalid" });
       } else {
+        await usersList.findByIdAndUpdate(userFound[0]._id, {
+          loginAttempts: loginAttempts,
+          resetPasswordSecureId: "qydbfi239u2rhr02jiej9",
+          resetPasswordToken: "qaw123",
+        });
         return res
           .status(429)
           .json({ error: "Many requests, reset password in your e-mail" });
+
+        //http://localhost:3333/user/resetpassword/token?email=xxx@xxx.com
       }
     }
 

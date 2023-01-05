@@ -13,9 +13,15 @@ const usersListSchema = new mongoose.Schema({
   },
   loginAttempts: {
     Type: Number,
+    default: 0,
+  },
+  resetPasswordSecureId: {
+    type: String,
+    default: "null",
   },
   resetPasswordToken: {
     type: String,
+    default: "null",
   },
 });
 
