@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const taskListSchema = new mongoose.Schema({
   user_id: mongoose.Types.ObjectId,
-  name: { type: String, default: " " },
+  task: { type: String, default: " " },
   hexColor: {
     type: String,
     default: "#000000",

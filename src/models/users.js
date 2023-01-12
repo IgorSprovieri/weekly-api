@@ -8,20 +8,20 @@ const usersListSchema = new mongoose.Schema({
   email: {
     type: String,
   },
+  password: {
+    type: String,
+    default: "",
+  },
   passwordHash: {
     type: String,
   },
-  loginAttempts: {
-    Type: Number,
-    default: 0,
-  },
-  resetPasswordSecureId: {
-    type: String,
-    default: "null",
-  },
   resetPasswordToken: {
     type: String,
-    default: "null",
+    default: "",
+  },
+  resetPasswordTokenCratedAt: {
+    type: Date,
+    default: null,
   },
 });
 

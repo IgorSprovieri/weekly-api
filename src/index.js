@@ -2,10 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const taskRoutes = require("./routes/task");
-const userRoutes = require("./routes/user");
-const sessionRoutes = require("./routes/session");
-const appRoutes = require("./routes/app");
+const Routes = require("./routes/index");
 
 const app = express();
 app.use(express.json());
@@ -30,9 +27,6 @@ app.listen(port, () => {
   connectDatabase().catch((error) => {
     console.log(error);
   });
-  app.use("/task", taskRoutes);
-  app.use("/user", userRoutes);
-  app.use("/session", sessionRoutes);
-  app.use("/app", appRoutes);
   console.log(`App listening on port ${port}`);
+  app.use("/", Routes);
 });
