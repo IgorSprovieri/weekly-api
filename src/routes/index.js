@@ -10,6 +10,7 @@ const authMiddleware = require("../middlewares/auth");
 router.post("/user", userController.post);
 router.post("/login", sessionController.login);
 router.post("/forgot-password", sessionController.forgotPassword);
+router.post("/reset-password", sessionController.resetPassword);
 
 router.get("/colors", colorController.get);
 router.post("/color", colorController.post);

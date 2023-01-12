@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const randomToken = require("random-token");
 const Mail = require("../libs/Mail");
+const DateFNS = require("date-fns");
 
 class sessionController {
   async login(req, res) {
@@ -66,18 +67,75 @@ class sessionController {
       const resetPasswordToken = randomToken(6);
       const resetPasswordTokenHash = bcrypt.hashSync(resetPasswordToken, 10);
 
-      usersList.findByIdAndUpdate(userFound[0]._id, {
+      await usersList.findByIdAndUpdate(userFound[0]._id, {
         resetPasswordToken: resetPasswordTokenHash,
         resetPasswordTokenCratedAt: Date.now(),
       });
 
-      const mailResponse = Mail.sendForgotPasswordEmail(
+      Mail.sendForgotPasswordEmail(
         userFound[0].email,
         userFound[0].name,
         resetPasswordToken
       );
 
-      return res.status(200).json({ mailResponse });
+      console.log(resetPasswordToken);
+      console.log(resetPasswordTokenHash);
+      console.log(userFound[0]._id);
+
+      return res.status(200).json({ sucess: true });
+    } catch (error) {
+      return res.status(500).json({ error: error?.message });
+    }
+  }
+
+  async resetPassword(req, res) {
+    try {
+      const token = req.body.token;
+      const email = req.body.email;
+      const password = req.body.password;
+
+      if (!token) {
+        return res.status(400).json({ error: "Token is missing" });
+      }
+      if (!password || !validation.validatePassword(password)) {
+        return res.status(400).json({ error: "E-mail or password is invalid" });
+      }
+
+      if (!email || !validation.validateEmail(email)) {
+        return res.status(400).json({ error: "E-mail or password is invalid" });
+      }
+
+      const userFound = await usersList.find({ email: email });
+
+      if (!userFound[0]) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const checkToken = await bcrypt.compareSync(
+        token,
+        userFound[0].resetPasswordToken
+      );
+
+      const validToken = () => {
+        const timeDifference = DateFNS.differenceInMinutes(
+          userFound[0].resetPasswordTokenCratedAt,
+          Date.now()
+        );
+
+        return timeDifference < 15;
+      };
+
+      if (!checkToken || !validToken) {
+        return res.status(401).json({ error: "Token is invalid" });
+      }
+
+      const passwordHash = bcrypt.hashSync(password, 10);
+
+      await usersList.findByIdAndUpdate(userFound[0]._id, {
+        passwordHash: passwordHash,
+      });
+
+      return res.status(200).json({ sucess: true });
     } catch (error) {
       return res.status(500).json({ error: error?.message });
     }

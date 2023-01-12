@@ -31,9 +31,9 @@ The application was deployed using Heroku and MongoDB Atlas
 - Node.js (<a href="https://nodejs.org/en/">nodejs.org/en/</a>)
 - Docker (<a href="https://www.docker.com">www.docker.com</a>)
 - MongoDB Compass (<a href="https://www.mongodb.com/products/compass">www.mongodb.com/products/compass</a>)
-- Mailjet account (<a href="https://app.mailjet.com/">app.mailjet.com/</a>)
+- Mailjet account (<a href="https://app.mailjet.com/">app.mailjet.com</a>)
 
-### Dependencies
+### Dependencies (npm)
 
 - Express.js
 - Mongoose
@@ -44,6 +44,7 @@ The application was deployed using Heroku and MongoDB Atlas
 - Random-token
 - Bcrypt
 - Node-mailjet
+- Date-fns
 
 ### To test
 
@@ -88,9 +89,9 @@ npm install
 
 6 - Create .env following example:
 
-_PORT=3333_</br>
-_DATABASE_URL=mongodb://localhost:27017_</br>
-_JWT_HASH=[my-secret-hash-here]_</br>
+PORT=3333</br>
+DATABASE_URL=mongodb://localhost:27017</br>
+JWT_HASH=[my-secret-hash-here]</br>
 MJ_API_KEY=</br>
 MJ_SECRET_KEY=</br>
 MY_EMAIL=</br>
@@ -98,7 +99,7 @@ MY_EMAIL_NAME=
 
 You can create a secret hash on site: <a href="https://www.md5hashgenerator.com">md5hashgenerator</a>
 
-The keys MJ_API_KEY, MJ_SECRET_KEY, MY_EMAIL, MY_EMAIL_NAME will be config bellow, it is to forgot/reset password email
+The keys MJ_API_KEY, MJ_SECRET_KEY, MY_EMAIL, MY_EMAIL_NAME will be config bellow. It is to forgot/reset password email
 
 7- Run the API:
 
@@ -114,7 +115,7 @@ npm run start:dev
 
 # Config Forgot/Reset Password Email
 
-To reset the password, the API send a email with a token and for this system work, you need to config some things
+To reset the password, the API send a email with a token. For this system work, you need to config some things:
 
 1. Create a mailjet development account (Link above)
 
@@ -139,6 +140,34 @@ To reset the password, the API send a email with a token and for this system wor
 - Insomnia (link above)
 
 ### Steps
+
+1. Open insomnia and import the json
+
+```
+\insomnia.json
+```
+
+2. Edit the Base_url to local host
+
+(Required create database following the Getting Started)
+
+General > Manage Enviroments
+
+```
+{
+	"BaseURL": "http://localhost:3333"
+}
+```
+
+3. You can test with production url too
+
+```
+{
+	"BaseURL": "https://weekly.herokuapp.com"
+}
+```
+
+4. Test the routes following rules bellow
 
 ## Routes
 
@@ -166,6 +195,7 @@ To reset the password, the API send a email with a token and for this system wor
 
 - Body:
   - [string] token (required)
+  - [string] email (required)(email format)
   - [string] password (required)(format is 6 numbers)
 
 [get]/colors
@@ -182,7 +212,7 @@ To reset the password, the API send a email with a token and for this system wor
 
 [delete]/color/:id
 
-### --------------- unauthenticated routes ---------------
+### --------------- authenticated routes ---------------
 
 [headers] (required in all authenticated routes)
 
@@ -223,7 +253,7 @@ To reset the password, the API send a email with a token and for this system wor
 
 - Body:
   - [string] task
-  - [string] hexColor (default: "#000000")(hex color format)
+  - [string] hexColor (hex color format)
   - [date] initialDate
   - [date] finalDate
   - [string] description
