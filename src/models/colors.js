@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
-const appColorsSchema = new mongoose.Schema({
+const colorsSchema = new mongoose.Schema({
   hexColor: {
     type: String,
   },
 });
 
-module.exports = mongoose.model("colors", appColorsSchema);
+module.exports = mongoose.model("colors", colorsSchema);
