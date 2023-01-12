@@ -9,6 +9,7 @@ const authMiddleware = require("../middlewares/auth");
 //------------ unauthenticated routes --------
 router.post("/user", userController.post);
 router.post("/login", sessionController.login);
+router.post("/forgot-password", sessionController.forgotPassword);
 
 router.get("/colors", colorController.get);
 router.post("/color", colorController.post);

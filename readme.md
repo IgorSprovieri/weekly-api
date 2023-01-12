@@ -31,6 +31,7 @@ The application was deployed using Heroku and MongoDB Atlas
 - Node.js (<a href="https://nodejs.org/en/">nodejs.org/en/</a>)
 - Docker (<a href="https://www.docker.com">www.docker.com</a>)
 - MongoDB Compass (<a href="https://www.mongodb.com/products/compass">www.mongodb.com/products/compass</a>)
+- Mailjet account (<a href="https://app.mailjet.com/">app.mailjet.com/</a>)
 
 ### Dependencies
 
@@ -42,6 +43,7 @@ The application was deployed using Heroku and MongoDB Atlas
 - Dotenv
 - Random-token
 - Bcrypt
+- Node-mailjet
 
 ### To test
 
@@ -88,9 +90,15 @@ npm install
 
 _PORT=3333_</br>
 _DATABASE_URL=mongodb://localhost:27017_</br>
-_JWT_HASH=mysecrethashere_
+_JWT_HASH=[my-secret-hash-here]_</br>
+MJ_API_KEY=</br>
+MJ_SECRET_KEY=</br>
+MY_EMAIL=</br>
+MY_EMAIL_NAME=
 
-You can create a hash on site: <a href="https://www.md5hashgenerator.com">md5hashgenerator</a>
+You can create a secret hash on site: <a href="https://www.md5hashgenerator.com">md5hashgenerator</a>
+
+The keys MJ_API_KEY, MJ_SECRET_KEY, MY_EMAIL, MY_EMAIL_NAME will be config bellow, it is to forgot/reset password email
 
 7- Run the API:
 
@@ -104,6 +112,26 @@ npm run start
 npm run start:dev
 ```
 
+# Config Forgot/Reset Password Email
+
+To reset the password, the API send a email with a token and for this system work, you need to config some things
+
+1. Create a mailjet development account (Link above)
+
+2. Go to Account Settings > REST API > API Key Management (Primary and Sub-account)
+
+3. Get the API KEY and SECRET KEY
+
+4. Put the API KEY and SECRET KEY on .env file
+
+   MJ_API_KEY=[your-API-KEY]</br>
+   MJ_SECRET_KEY=[your-SECRET-KEY]
+
+5. Put your email and your name that will be used to send email on .env file
+
+   MY_EMAIL=[your-email]</br>
+   MY_EMAIL_NAME=[your-name]
+
 ## To test
 
 ### Dependencies
@@ -114,7 +142,7 @@ npm run start:dev
 
 ## Routes
 
------------- unauthenticated routes --------
+### --------------- unauthenticated routes ---------------
 
 [post]/user
 
@@ -127,6 +155,17 @@ npm run start:dev
 
 - Body:
   - [string] email (required)(email format)
+  - [string] password (required)(format is 6 numbers)
+
+[post]forgot-password
+
+- Body:
+  - [string] email (required)(email format)
+
+[post]reset-password
+
+- Body:
+  - [string] token (required)
   - [string] password (required)(format is 6 numbers)
 
 [get]/colors
@@ -143,7 +182,7 @@ npm run start:dev
 
 [delete]/color/:id
 
------------- authenticated routes --------
+### --------------- unauthenticated routes ---------------
 
 [headers] (required in all authenticated routes)
 
