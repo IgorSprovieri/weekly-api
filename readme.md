@@ -267,7 +267,7 @@ General > Manage Enviroments
 
 ## Author
 
-<img src="./public/my image.jpeg" width="200" height="200">
+<img src="./public/My image.jpeg" width="22%">
 
 ## _Igor Sprovieri Pereira_
 
