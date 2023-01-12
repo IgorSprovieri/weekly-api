@@ -1,4 +1,8 @@
-# Weekly
+# Weekly - Task Manager API
+
+<img src="./public/Logo.png" width="100%">
+
+## Description
 
 Weekly is a task manager API made with mongoose and express.js
 
@@ -263,6 +267,8 @@ General > Manage Enviroments
 
 ## Author
 
-Igor Sprovieri Pereira
+<img src="./public/my image.jpeg" width="200" height="200">
+
+## _Igor Sprovieri Pereira_
 
 Programming student since 2013, started working with Unity C# in 2020, paticipated in 16 team projects as a freelancer and his own game studio. At this time, he was a tutor on Crie Seus Jogos company, helping students and writing articles to company's website. In 2022 he decided to learn web development with HTML, CSS and JS. Actually he is back-end programmer and he is specializing in node.js, mongoose, postgres and sequelize.
