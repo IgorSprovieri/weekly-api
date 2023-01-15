@@ -18,10 +18,6 @@ async function connectDatabase() {
   await mongoose.connect(process.env.DATABASE_URL);
 }
 
-app.get("/", function (req, res) {
-  res.send("It is a task manager API called weekly");
-});
-
 app.listen(port, () => {
   mongoose.set("strictQuery", true);
   connectDatabase().catch((error) => {

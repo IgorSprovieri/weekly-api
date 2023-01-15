@@ -7,6 +7,10 @@ const taskController = require("../controllers/task");
 const authMiddleware = require("../middlewares/auth");
 
 //------------ unauthenticated routes --------
+router.get("/", function (req, res) {
+  return res.send("It is a task manager API called weekly");
+});
+
 router.post("/user", userController.post);
 router.post("/login", sessionController.login);
 router.post("/forgot-password", sessionController.forgotPassword);
