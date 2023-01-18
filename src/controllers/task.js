@@ -5,7 +5,7 @@ class taskController {
   async get(req, res) {
     try {
       const userId = req.userId;
-      const { initialDate, finalDate } = req.body;
+      const { initialDate, finalDate } = req.query;
       let initialDateTest = new Date(initialDate);
       let finalDateTest = new Date(finalDate);
 

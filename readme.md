@@ -239,7 +239,7 @@ General > Manage Enviroments
 
 [get]/task
 
-- Body:
+- Query:
   - [date] initialDate (required)
   - [date] finalDate (required)
 
