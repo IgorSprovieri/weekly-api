@@ -46,7 +46,8 @@ class taskController {
   async post(req, res) {
     try {
       const userId = req.userId;
-      const { task, initialDate, finalDate, description, checked } = req.body;
+      const { task, hexColor, initialDate, finalDate, description, checked } =
+        req.body;
 
       if (!initialDate || !validation.validateDate(initialDate)) {
         return res.status(400).json({ error: "Initial date is invalid" });
@@ -56,9 +57,14 @@ class taskController {
         return res.status(400).json({ error: "Final date is invalid" });
       }
 
+      if (hexColor) {
+        if (!validation.validateHexColor(hexColor)) {
+          return res.status(400).json({ error: "Hex color is invalid" });
+        }
+      }
       if (checked) {
         if (!validation.validateBool(checked)) {
-          return res.status(400).json({ error: "Final date is invalid" });
+          return res.status(400).json({ error: "Checked is invalid" });
         }
       }
 
@@ -78,6 +84,7 @@ class taskController {
       const newTask = await tasksList.create({
         user_id: userId,
         task: task,
+        hexColor: hexColor,
         initialDate: initialDate,
         finalDate: finalDate,
         description: description,

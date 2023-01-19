@@ -5,7 +5,7 @@ const taskListSchema = new mongoose.Schema({
   task: { type: String, default: " " },
   hexColor: {
     type: String,
-    default: "#000000",
+    default: "#FFFFFF",
   },
   initialDate: Date,
   finalDate: Date,
