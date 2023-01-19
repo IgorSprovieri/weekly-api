@@ -6,8 +6,8 @@ class taskController {
     try {
       const userId = req.userId;
       const { initialDate, finalDate } = req.query;
-      let initialDateTest = new Date(initialDate);
-      let finalDateTest = new Date(finalDate);
+      let initialDateTest = new Date(initialDate).toISOString;
+      let finalDateTest = new Date(finalDate).toISOString;
 
       if (!initialDate || !validation.validateDate(initialDate)) {
         return res.status(400).json({ error: "Initial date is invalid" });
@@ -17,7 +17,7 @@ class taskController {
         return res.status(400).json({ error: "Final date is invalid" });
       }
 
-      if (initialDateTest.getDate() > finalDateTest.getDate()) {
+      if (initialDateTest > finalDateTest) {
         return res
           .status(400)
           .json({ error: "Final date must be greater than start date" });
