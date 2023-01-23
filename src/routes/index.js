@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const appController = require("../controllers/app");
 const colorController = require("../controllers/color");
 const userController = require("../controllers/user");
 const sessionController = require("../controllers/session");
@@ -10,6 +11,7 @@ const authMiddleware = require("../middlewares/auth");
 router.get("/", function (req, res) {
   return res.send("It is a task manager API called weekly");
 });
+router.get("/addDays", appController.getAddDays);
 
 router.post("/user", userController.post);
 router.post("/login", sessionController.login);
