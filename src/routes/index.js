@@ -12,6 +12,7 @@ router.get("/", function (req, res) {
   return res.send("It is a task manager API called weekly");
 });
 router.get("/addDays", appController.getAddDays);
+router.get("/list-of-days", appController.getListOfDays);
 
 router.post("/user", userController.post);
 router.post("/login", sessionController.login);
