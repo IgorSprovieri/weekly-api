@@ -62,6 +62,7 @@ class taskController {
           return res.status(400).json({ error: "Hex color is invalid" });
         }
       }
+
       if (checked) {
         if (!validation.validateBool(checked)) {
           return res.status(400).json({ error: "Checked is invalid" });
@@ -125,7 +126,8 @@ class taskController {
 
   async put(req, res) {
     try {
-      const { task, initialDate, finalDate, description, checked } = req.body;
+      const { task, initialDate, finalDate, hexColor, description, checked } =
+        req.body;
       const id = req.params.id;
       const userId = req.userId;
 
@@ -142,6 +144,12 @@ class taskController {
       if (finalDate) {
         if (!validation.validateDate(finalDate)) {
           return res.status(400).json({ error: "Final date is invalid" });
+        }
+      }
+
+      if (hexColor) {
+        if (!validation.validateHexColor(hexColor)) {
+          return res.status(400).json({ error: "Hex color is invalid" });
         }
       }
 
@@ -165,6 +173,7 @@ class taskController {
         id,
         {
           task: task,
+          hexColor: hexColor,
           initialDate: initialDate,
           finalDate: finalDate,
           description: description,
