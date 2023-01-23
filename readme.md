@@ -6,13 +6,22 @@
 
 Weekly is a task manager API made with mongoose and express.js
 
-## Production App
+## Production API
 
 To acess the final API, use the link:
 
-<a href="https://weekly.herokuapp.com">weekly.herokuapp.com</a>
+<a href="https://weekly.herokuapp.com">https://weekly.herokuapp.com</a>
 
 The application was deployed using Heroku and MongoDB Atlas
+
+## Front-End App
+
+This api has an app made with HTML, CSS and JS
+
+You can access the repository and the website:
+
+- Repository: <a href="https://github.com/IgorSprovieri/weekly-web">github.com/IgorSprovieri/weekly-web</a>
+- Website: <a href="https://igorsprovieri.github.io/weekly-web">igorsprovieri.github.io/weekly-web</a>
 
 ## Features
 
