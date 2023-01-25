@@ -18,6 +18,8 @@ The application was deployed using Heroku and MongoDB Atlas
 
 This api has an app made with HTML, CSS and JS
 
+<img src="./public/preview front-end.png" width="50%">
+
 You can access the repository and the website:
 
 - Repository: <a href="https://github.com/IgorSprovieri/weekly-web">github.com/IgorSprovieri/weekly-web</a>
