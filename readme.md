@@ -186,6 +186,10 @@ General > Manage Enviroments
 
 ## Routes
 
+### --------------- public routes ---------------
+
+[get]/public/dateFNS.js
+
 ### --------------- unauthenticated routes ---------------
 
 [post]/user
@@ -248,11 +252,7 @@ General > Manage Enviroments
 - Body:
   - [string] password (required)(format is 6 numbers)
 
-[get]/task
-
-- Query:
-  - [date] initialDate (required)
-  - [date] finalDate (required)
+[get]/task?initialDate=<yyyy/mm/dd>T00%3A00%3A00.000Z&finalDate=<yyyy/mm/dd>T23%3A59%3A59.000Z
 
 [post]/task
 
