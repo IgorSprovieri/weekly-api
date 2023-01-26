@@ -7,13 +7,14 @@ const sessionController = require("../controllers/session");
 const taskController = require("../controllers/task");
 const authMiddleware = require("../middlewares/auth");
 
-//------------ unauthenticated routes --------
+//------------ Static Routes ----------
 router.get("/", function (req, res) {
-  return res.send("It is a task manager API called weekly");
+  return res.send("It is a task manager API called Weekly");
 });
-router.get("/addDays", appController.getAddDays);
-router.get("/list-of-days", appController.getListOfDays);
 
+router.use("/static", express.static("public"));
+
+//------------ unauthenticated routes --------
 router.post("/user", userController.post);
 router.post("/login", sessionController.login);
 router.post("/forgot-password", sessionController.forgotPassword);
