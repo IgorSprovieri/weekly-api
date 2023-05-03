@@ -14,7 +14,7 @@ class colorController {
 
   async post(req, res) {
     try {
-      const color = req.body.color;
+      const color = req.body;
 
       if (!color || !validation.validateHexColor(color)) {
         return res.status(400).json({ error: "Invalid hex color" });

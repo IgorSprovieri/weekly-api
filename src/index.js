@@ -3,19 +3,22 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const Routes = require("./routes/index");
+const config = require("./config/index");
+const enviroment = process.env.ENVIROMENT;
 
 const app = express();
 app.use(express.json());
+app.use("/", Routes);
 app.use(
   cors({
     origin: "*",
   })
 );
 
-const port = Number(process.env.PORT);
+const port = config[enviroment].port;
 
 async function connectDatabase() {
-  await mongoose.connect(process.env.DATABASE_URL);
+  await mongoose.connect(config[enviroment].database);
 }
 
 app.listen(port, () => {
@@ -24,5 +27,4 @@ app.listen(port, () => {
     console.log(error);
   });
   console.log(`App listening on port ${port}`);
-  app.use("/", Routes);
 });

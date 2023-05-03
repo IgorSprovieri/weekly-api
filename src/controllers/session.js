@@ -78,10 +78,6 @@ class sessionController {
         resetPasswordToken
       );
 
-      console.log(resetPasswordToken);
-      console.log(resetPasswordTokenHash);
-      console.log(userFound[0]._id);
-
       return res.status(200).json({ sucess: true });
     } catch (error) {
       return res.status(500).json({ error: error?.message });
