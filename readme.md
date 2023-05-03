@@ -4,21 +4,19 @@
 
 ## Description
 
-Weekly is a task manager API made with mongoose and express.js
+Weekly is a task manager API made with node.js, express.js and mongoose.
 
-## Production API
+## Production Link
 
 To acess the final API, use the link:
 
-<a href="https://weekly.herokuapp.com">https://weekly.herokuapp.com</a>
+<a href="ec2-3-144-86-147.us-east-2.compute.amazonaws.com">ec2-3-144-86-147.us-east-2.compute.amazonaws.com</a>
 
-The application was deployed using Heroku and MongoDB Atlas
+The application was deployed using AWS EC2 and MongoDB Atlas
 
-## Front-End App
+## Weekly App
 
 This api has an app made with HTML, CSS and JS
-
-<img src="./public/preview front-end.png" width="50%">
 
 You can access the repository and the website:
 
@@ -31,48 +29,23 @@ You can access the repository and the website:
 - Save, get, update and delete tasks
 - Save and get colors to use for tasks
 
-## Used technologies
+## Documentation
 
-- Node.js
-- Express.js
-- Mongoose
-- Docker
-- Nodemon
-- JsonWebToken
-- Insomnia
+Use insomnia to open the file below:
 
-### Required
+```
+https://github.com/IgorSprovieri/Weekly/blob/main/insomnia.json
+```
+
+### Requirements
 
 - Node.js (<a href="https://nodejs.org/en/">nodejs.org/en/</a>)
 - Docker (<a href="https://www.docker.com">www.docker.com</a>)
-- MongoDB Compass (<a href="https://www.mongodb.com/products/compass">www.mongodb.com/products/compass</a>)
-- Mailjet account (<a href="https://app.mailjet.com/">app.mailjet.com</a>)
-
-### Dependencies (npm)
-
-- Express.js
-- Mongoose
-- Nodemon
-- JsonWebToken
-- Cors
-- Dotenv
-- Random-token
-- Bcrypt
-- Node-mailjet
-- Date-fns
-
-### To test
-
-- Insomnia (<a href="https://insomnia.rest/download">insomnia.rest/download</a>)
-
-### To deploy
-
-- MongoDB Atlas (<a href="https://www.mongodb.com">www.mongodb.com</a>)
-- Heroku (<a href="https://id.heroku.com">id.heroku.com</a>)
+- Mailjet Account (<a href="https://app.mailjet.com/">app.mailjet.com</a>)
 
 ## Getting Started
 
-1- Clone the repository:
+1- Clone the repo:
 
 ```
 git clone https://github.com/IgorSprovieri/Weekly
@@ -104,17 +77,23 @@ npm install
 
 6 - Create .env following example:
 
-PORT=3333</br>
-DATABASE_URL=mongodb://localhost:27017</br>
-JWT_HASH=[my-secret-hash-here]</br>
+ENVIROMENT=dev
+
+PROD_PORT=</br>
+PROD_DB=</br>
+TEST_PORT=</br>
+TEST_DB=</br>
+
+JWT_HASH=
+
 MJ_API_KEY=</br>
 MJ_SECRET_KEY=</br>
 MY_EMAIL=</br>
-MY_EMAIL_NAME=
+MY_EMAIL_NAME=</br>
 
-You can create a secret hash on site: <a href="https://www.md5hashgenerator.com">md5hashgenerator</a>
+You can create a jwt hash on site: <a href="https://www.md5hashgenerator.com">md5hashgenerator</a>
 
-The keys MJ_API_KEY, MJ_SECRET_KEY, MY_EMAIL, MY_EMAIL_NAME will be config bellow. It is to forgot/reset password email
+The keys MJ_API_KEY, MJ_SECRET_KEY, MY_EMAIL, MY_EMAIL_NAME will be config bellow. It's to forgot/reset password email
 
 7- Run the API:
 
@@ -128,7 +107,7 @@ npm run start
 npm run start:dev
 ```
 
-# Config Forgot/Reset Password Email
+## Config Forgot/Reset Password Email
 
 To reset the password, the API send a email with a token. For this system work, you need to config some things:
 
@@ -147,42 +126,6 @@ To reset the password, the API send a email with a token. For this system work, 
 
    MY_EMAIL=[your-email]</br>
    MY_EMAIL_NAME=[your-name]
-
-## To test
-
-### Dependencies
-
-- Insomnia (link above)
-
-### Steps
-
-1. Open insomnia and import the json
-
-```
-\insomnia.json
-```
-
-2. Edit the Base_url to local host
-
-(Required create database following the Getting Started)
-
-General > Manage Enviroments
-
-```
-{
-	"BaseURL": "http://localhost:3333"
-}
-```
-
-3. You can test with production url too
-
-```
-{
-	"BaseURL": "https://weekly.herokuapp.com"
-}
-```
-
-4. Test the routes following rules bellow
 
 ## Routes
 
@@ -236,7 +179,7 @@ General > Manage Enviroments
 [headers] (required in all authenticated routes)
 
 - [auth] bearer token
-- [string] email
+- [string] email (email format)
 
 [get]/user
 
@@ -278,8 +221,8 @@ General > Manage Enviroments
 
 ## Author
 
-<img src="./public/My image.jpeg" width="22%">
+<img src="./public/MyImage.jpeg" width="22%">
 
 ### _Igor Sprovieri Pereira_
 
-Programming student since 2013, started working with Unity C# in 2020, paticipated in 16 team projects as a freelancer and his own game studio. At this time, he was a tutor on Crie Seus Jogos company, helping students and writing articles to company's website. In 2022 he decided to learn web development with HTML, CSS and JS. Actually he is fullstack programmer and he is specializing in react.js, node.js, docker, mongoose, postgres and sequelize.
+Programming student since 2013, started working with Unity C# in 2020, paticipated in 16 projects as a freelancer and his own game studio. At this time, he was a tutor on Crie Seus Jogos company, helping students and writing articles to company's website. In 2022 he decided to learn web development with HTML, CSS and JS. Actually he is a fullstack programmer using javascript/typescript, react.js, node.js, express.js, docker, mongoose(mongoDB), postgres, sequelize and AWS.

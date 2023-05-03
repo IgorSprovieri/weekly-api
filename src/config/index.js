@@ -1,6 +1,6 @@
 const config = {
   dev: {
-    database: "locahost",
+    database: "mongodb://localhost:27017",
     port: 3333,
   },
   test: {
