@@ -10,7 +10,7 @@ Weekly is a task manager API made with node.js, express.js and mongoose.
 
 To acess the final API, use the link:
 
-<a href="ec2-3-144-86-147.us-east-2.compute.amazonaws.com">ec2-3-144-86-147.us-east-2.compute.amazonaws.com</a>
+<a href="http://ec2-3-144-86-147.us-east-2.compute.amazonaws.com:3333">http://ec2-3-144-86-147.us-east-2.compute.amazonaws.com:3333</a>
 
 The application was deployed using AWS EC2 and MongoDB Atlas
 
