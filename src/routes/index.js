@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const appController = require("../controllers/app");
 const colorController = require("../controllers/color");
 const userController = require("../controllers/user");
 const sessionController = require("../controllers/session");
@@ -9,10 +8,8 @@ const authMiddleware = require("../middlewares/auth");
 
 //------------ Static Routes ----------
 router.get("/", function (req, res) {
-  return res.send("It is a task manager API called Weekly");
+  return res.send("It's a task manager API called Weekly");
 });
-
-router.use("/static", express.static("public"));
 
 //------------ unauthenticated routes --------
 router.post("/user", userController.post);
