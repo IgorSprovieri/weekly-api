@@ -7,8 +7,9 @@ const config = require("./config/index");
 const enviroment = process.env.ENVIROMENT;
 
 const app = express();
-app.use(express.json());
 app.use(cors({ origin: process.env.CORS_ORIGIN }));
+app.use(express.json());
+app.use("/", Routes);
 
 const port = config[enviroment].port;
 
@@ -22,5 +23,4 @@ app.listen(port, () => {
     console.log(error);
   });
   console.log(`App listening on port ${port}`);
-  app.use("/", Routes);
 });
