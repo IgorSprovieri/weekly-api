@@ -1,27 +1,8 @@
-# Weekly - Task Manager API
-
 <img src="./public/Logo.png" width="100%">
 
-## Description
+# Weekly API
 
-Weekly is a task manager API made with node.js, express.js and mongoose.
-
-## Production Link
-
-To acess the final API, use the link:
-
-<a href="https://api.weekly.ispapps.com">api.weekly.ispapps.com</a>
-
-The application was deployed using AWS EC2 and MongoDB Atlas
-
-## Weekly App
-
-This api has an app made with HTML, CSS and JS
-
-You can access the repository and the website:
-
-- Repository: <a href="https://github.com/IgorSprovieri/weekly-web">github.com/IgorSprovieri/weekly-web</a>
-- Website: <a href="https://igorsprovieri.github.io/weekly-web">igorsprovieri.github.io/weekly-web</a>
+Weekly is a task manager API made with node.js, express.js and mongoose
 
 ## Features
 
@@ -29,12 +10,24 @@ You can access the repository and the website:
 - Save, get, update and delete tasks
 - Save and get colors to use for tasks
 
+## Production Link
+
+This api was deployed using AWS EC2 and MongoDB Atlas
+
+- link: <a href="https://api.weekly.ispapps.com">api.weekly.ispapps.com</a>
+
+## Weekly Web App
+
+This api has an app made with HTML, CSS and JS
+
+- Link: <a href="https://weekly.ispapps.com">weekly.ispapps.com</a>
+
 ## Documentation
 
 Use insomnia to open the file below:
 
 ```
-https://github.com/IgorSprovieri/Weekly/blob/main/insomnia.json
+https://github.com/IgorSprovieri/weekly-api/blob/main/insomnia.json
 ```
 
 ### Requirements
@@ -129,10 +122,6 @@ To reset the password, the API send a email with a token. For this system work, 
 
 ## Routes
 
-### --------------- public routes ---------------
-
-[get]/public/dateFNS.js
-
 ### --------------- unauthenticated routes ---------------
 
 [post]/user
@@ -225,4 +214,4 @@ To reset the password, the API send a email with a token. For this system work, 
 
 ### _Igor Sprovieri Pereira_
 
-Programming student since 2013, started working with Unity C# in 2020, paticipated in 16 projects as a freelancer and his own game studio. At this time, he was a tutor on Crie Seus Jogos company, helping students and writing articles to company's website. In 2022 he decided to learn web development with HTML, CSS and JS. Actually he is a fullstack programmer using javascript/typescript, react.js, node.js, express.js, docker, mongoose(mongoDB), postgres, sequelize and AWS.
+In 2013 I learned to programming games how as a hobbie, in 2020 I started to work on this area, I did some freelancers, opened my game studio and I was a writter for over a year on site crieseusjogos.com. In 2022 I decided to go a web developer professional and today I am fullstack with react and node

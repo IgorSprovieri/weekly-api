@@ -5,9 +5,13 @@ const cors = require("cors");
 const Routes = require("./routes/index");
 const config = require("./config/index");
 const enviroment = process.env.ENVIROMENT;
-
 const app = express();
-app.use(cors());
+
+const corsOptions = {
+  origin: "https://weekly.ispapps.com",
+};
+
+app.use(cors(enviroment === "prod" ? corsOptions : "*"));
 app.use(express.json());
 app.use("/", Routes);
 
