@@ -8,7 +8,7 @@ const enviroment = process.env.ENVIROMENT;
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: process.env.CORS_ORIGIN }));
 
 const port = config[enviroment].port;
 
