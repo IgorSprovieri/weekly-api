@@ -7,7 +7,7 @@ const config = require("./config/index");
 const enviroment = process.env.ENVIROMENT;
 
 const app = express();
-app.use(cors({ origin: process.env.CORS_ORIGIN }));
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use("/", Routes);
 
