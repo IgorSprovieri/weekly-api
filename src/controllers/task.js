@@ -46,8 +46,8 @@ class taskController {
   async post(req, res) {
     try {
       const userId = req.userId;
-      const { task, hexColor, initialDate, finalDate, description, checked } =
-        req.body;
+      const { initialDate, finalDate } = req.body;
+      const { task, hexColor, description, subTasks, checked } = req.body;
 
       if (!initialDate || !validation.validateDate(initialDate)) {
         return res.status(400).json({ error: "Initial date is invalid" });
@@ -61,6 +61,20 @@ class taskController {
         if (!validation.validateHexColor(hexColor)) {
           return res.status(400).json({ error: "Hex color is invalid" });
         }
+      }
+
+      if (subTasks && subTasks.length > 0) {
+        if (!subTasks.task || !subTasks.checked) {
+          return res.status(400).json({ error: "Subtask is invalid" });
+        }
+
+        subTasks?.forEach((subTask) => {
+          if (!validation.validateBool(subTask?.checked)) {
+            return res
+              .status(400)
+              .json({ error: "Subtask checked is invalid" });
+          }
+        });
       }
 
       if (checked) {
@@ -89,6 +103,7 @@ class taskController {
         initialDate: initialDate,
         finalDate: finalDate,
         description: description,
+        subtasks: subTasks,
         checked: checked,
       });
 
@@ -126,8 +141,8 @@ class taskController {
 
   async put(req, res) {
     try {
-      const { task, initialDate, finalDate, hexColor, description, checked } =
-        req.body;
+      const { initialDate, finalDate } = req.body;
+      const { task, hexColor, description, subTasks, checked } = req.body;
       const id = req.params.id;
       const userId = req.userId;
 
@@ -151,6 +166,20 @@ class taskController {
         if (!validation.validateHexColor(hexColor)) {
           return res.status(400).json({ error: "Hex color is invalid" });
         }
+      }
+
+      if (subTasks && subTasks.length > 0) {
+        if (!subTasks.task || !subTasks.checked) {
+          return res.status(400).json({ error: "Subtask is invalid" });
+        }
+
+        subTasks?.forEach((subTask) => {
+          if (!validation.validateBool(subTask?.checked)) {
+            return res
+              .status(400)
+              .json({ error: "Subtask checked is invalid" });
+          }
+        });
       }
 
       if (checked) {

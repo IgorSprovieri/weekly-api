@@ -10,6 +10,7 @@ const taskListSchema = new mongoose.Schema({
   initialDate: Date,
   finalDate: Date,
   description: { type: String, default: " " },
+  subTasks: { type: [{ task: String, checked: Boolean }], default: [] },
   checked: { type: Boolean, default: false },
 });
 
