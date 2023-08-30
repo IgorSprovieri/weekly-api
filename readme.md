@@ -136,7 +136,9 @@ To reset the password, the API send a email with a token. For this system work, 
 
 ### `GET` /colors
 
-#### --------------- authenticated routes ---------------
+### --------------- authenticated routes ---------------
+
+---
 
 ### `headers`
 
