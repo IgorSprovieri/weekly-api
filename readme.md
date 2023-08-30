@@ -2,30 +2,50 @@
 
 # Weekly API
 
-Weekly is a task manager API made with Node, Express and Mongoose
-
-## Features
+Weekly it's a task manager API that include:
 
 - Users and login system
 - Create, read, update and delete tasks
 - Create, read, update and delete categories to use in your tasks
 - Get predefined colors to use in your categories
 
-## Production Link
+## Used Tecnologies
 
-This api was deployed using Railway.app and MongoDB Atlas
+- Node
+- Express
+- Mongoose
+- Docker
 
-- link: [api.weekly.ispapps.com](https://api.weekly.ispapps.com)
+## Main Concepts Applied
+
+- REST API
+- HTTP ROUTES
+- noSQL with mongoDB
+- Json Web Token
+- Middlewares
+- Email Provider
 
 ## Documentation
 
-Use insomnia to open the file below:
+- 1. Use insomnia to open the file below:
 
 ```
 https://github.com/IgorSprovieri/weekly-api/blob/main/insomnia.json
 ```
 
-### Requirements
+- 2. Live Application: [api.weekly.ispapps.com](https://api.weekly.ispapps.com)
+
+```
+Use this live application to test on insomnia
+```
+
+- 3. Read the docs: [Weekly API Docs](#routes)
+
+```
+Read the docs to use the API
+```
+
+## Requirements To Run
 
 - Node.js (<a href="https://nodejs.org/en/">nodejs.org/en</a>)
 - Docker (<a href="https://www.docker.com">www.docker.com</a>)
@@ -67,9 +87,7 @@ npm install
 
 </br>ENVIROMENT=dev
 </br>CORS_URL=\*
-
 </br>JWT_HASH=
-
 </br>MJ_API_KEY=
 </br>MJ_SECRET_KEY=
 </br>MY_EMAIL=
@@ -77,7 +95,7 @@ npm install
 
 You can create a JWT_HASH on site: [md5hashgenerator](https://www.md5hashgenerator.com)
 
-The keys MJ_API_KEY, MJ_SECRET_KEY, MY_EMAIL, MY_EMAIL_NAME will be config bellow
+The keys MJ_API_KEY, MJ_SECRET_KEY, MY_EMAIL, MY_EMAIL_NAME will be config below
 
 7- Run the API:
 
