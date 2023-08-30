@@ -1,5 +1,4 @@
 const appColorsList = require("../models/colors");
-const validation = require("../libs/validation");
 
 class colorController {
   async get(req, res) {

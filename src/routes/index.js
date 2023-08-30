@@ -4,6 +4,7 @@ const colorController = require("../controllers/color");
 const userController = require("../controllers/user");
 const sessionController = require("../controllers/session");
 const taskController = require("../controllers/task");
+const categoryController = require("../controllers/category");
 const authMiddleware = require("../middlewares/auth");
 
 //------------ Static Routes ----------
@@ -25,6 +26,8 @@ router.use(authMiddleware);
 router.get("/user", userController.get);
 router.put("/user", userController.put);
 router.delete("/user", userController.delete);
+
+router.post("/category", categoryController.post);
 
 router.get("/task", taskController.get);
 router.post("/task", taskController.post);

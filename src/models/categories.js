@@ -8,3 +8,5 @@ const categoriesListSchema = mongoose.Schema({
     default: "#39526C",
   },
 });
+
+module.exports = mongoose.model("categories", categoriesListSchema);
