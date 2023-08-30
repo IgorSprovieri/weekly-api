@@ -18,9 +18,6 @@ router.post("/forgot-password", sessionController.forgotPassword);
 router.post("/reset-password", sessionController.resetPassword);
 
 router.get("/colors", colorController.get);
-router.post("/color", colorController.post);
-router.put("/color/:id", colorController.put);
-router.delete("/color/:id", colorController.delete);
 
 //------------ authenticated routes --------
 router.use(authMiddleware);
