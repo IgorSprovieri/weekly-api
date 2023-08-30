@@ -27,7 +27,7 @@ https://github.com/IgorSprovieri/weekly-api/blob/main/insomnia.json
 
 ### Requirements
 
-- Node.js (<a href="https://nodejs.org/en/">nodejs.org/en/</a>)
+- Node.js (<a href="https://nodejs.org/en/">nodejs.org/en</a>)
 - Docker (<a href="https://www.docker.com">www.docker.com</a>)
 - Mailjet Account (<a href="https://app.mailjet.com/">app.mailjet.com</a>)
 
