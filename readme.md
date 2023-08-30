@@ -2,25 +2,20 @@
 
 # Weekly API
 
-Weekly is a task manager API made with node.js, express.js and mongoose
+Weekly is a task manager API made with Node, Express and Mongoose
 
 ## Features
 
 - Users and login system
-- Save, get, update and delete tasks
-- Save and get colors to use for tasks
+- Create, read, update and delete tasks
+- Create, read, update and delete categories to use in your tasks
+- Get predefined colors to use in your categories
 
 ## Production Link
 
-This api was deployed using AWS EC2 and MongoDB Atlas
+This api was deployed using Railway.app and MongoDB Atlas
 
-- link: <a href="https://api.weekly.ispapps.com">api.weekly.ispapps.com</a>
-
-## Weekly Web App
-
-This api has an app made with HTML, CSS and JS
-
-- Link: <a href="https://weekly.ispapps.com">weekly.ispapps.com</a>
+- link: [api.weekly.ispapps.com](https://api.weekly.ispapps.com)
 
 ## Documentation
 
@@ -70,23 +65,19 @@ npm install
 
 6 - Create .env following example:
 
-ENVIROMENT=dev
+</br>ENVIROMENT=dev
+</br>CORS_URL=\*
 
-PROD_PORT=</br>
-PROD_DB=</br>
-TEST_PORT=</br>
-TEST_DB=</br>
+</br>JWT_HASH=
 
-JWT_HASH=
+</br>MJ_API_KEY=
+</br>MJ_SECRET_KEY=
+</br>MY_EMAIL=
+</br>MY_EMAIL_NAME=Weekly
 
-MJ_API_KEY=</br>
-MJ_SECRET_KEY=</br>
-MY_EMAIL=</br>
-MY_EMAIL_NAME=</br>
+You can create a JWT_HASH on site: [md5hashgenerator](https://www.md5hashgenerator.com)
 
-You can create a jwt hash on site: <a href="https://www.md5hashgenerator.com">md5hashgenerator</a>
-
-The keys MJ_API_KEY, MJ_SECRET_KEY, MY_EMAIL, MY_EMAIL_NAME will be config bellow. It's to forgot/reset password email
+The keys MJ_API_KEY, MJ_SECRET_KEY, MY_EMAIL, MY_EMAIL_NAME will be config bellow
 
 7- Run the API:
 
@@ -122,96 +113,105 @@ To reset the password, the API send a email with a token. For this system work, 
 
 ## Routes
 
-### --------------- unauthenticated routes ---------------
+### `POST` /user
 
-[post]/user
+- name `string`
+- email `string` `required` `email format`
+- password `string` `required` `six numbers format`
 
-- Body:
-  - [string] name
-  - [string] email (required)(email format)
-  - [string] password (required)(format is 6 numbers)
+### `POST` /login
 
-[post]login
+- email `string` `required` `email format`
+- password `string` `required` `six numbers format`
 
-- Body:
-  - [string] email (required)(email format)
-  - [string] password (required)(format is 6 numbers)
+### `POST` /forgot-password
 
-[post]forgot-password
+- email `string` `required` `email format`
 
-- Body:
-  - [string] email (required)(email format)
+### `POST` /reset-password
 
-[post]reset-password
+- token `required`
+- email `string` `required` `email format`
+- password `string` `required` `six numbers format`
 
-- Body:
-  - [string] token (required)
-  - [string] email (required)(email format)
-  - [string] password (required)(format is 6 numbers)
+### `GET` /colors
 
-[get]/colors
+#### --------------- authenticated routes ---------------
 
-[post]/color
+### `headers`
 
-- Body:
-  - [string] hexColor (required)(hex color format)
+```
+-  bearer token (required in all authenticated routes)
+```
 
-[put]/color/:id
+### `GET` /user
 
-- Body:
-  - [string] hexColor (hex color format)
+### `PUT` /user
 
-[delete]/color/:id
+- name `string`
+- email `string` `email format`
+- password `string` `six numbers format`
 
-### --------------- authenticated routes ---------------
+### `DELETE` /user
 
-[headers] (required in all authenticated routes)
+```
+- password `string` `six numbers format`
+```
 
-- [auth] bearer token
-- [string] email (email format)
+### `POST` /category
 
-[get]/user
+```
+- name `string` `required`
+- hexColor `string` `required` `hex color format`
+```
 
-[put]/user
+### `GET` /categories
 
-- Body:
-  - [string] name
-  - [string] email (email format)
-  - [string] password (format is 6 numbers)
+```
+- name `string` `required`
+- hexColor `string` `required` `hex color format`
+```
 
-[delete]/user
+### `PUT` /category/:id
 
-- Body:
-  - [string] password (required)(format is 6 numbers)
+```
+- name `string`
+- hexColor `string` `hex color format`
+```
 
-[get]/task?initialDate=<yyyy/mm/dd>T00%3A00%3A00.000Z&finalDate=<yyyy/mm/dd>T23%3A59%3A59.000Z
+### `DELETE` /category/:id
 
-[post]/task
+### `POST` /task
 
-- Body:
-  - [string] task
-  - [string] hexColor (default: "#000000")(hex color format)
-  - [date] initialDate (required)
-  - [date] finalDate (required)
-  - [string] description
-  - [bool] isChecked (default: false)
+```
 
-[put]/task/:id
+- task `string`
+- category `object` `required` `{ [string]name, [string]hexColor }`
+- initialDate `date` `required`
+- finalDate `date` `required`
+- description `string`
+- subTasks `array` `required` `{ task: string, checked: boolean }`
+- isChecked `boolean`
+```
 
-- Body:
-  - [string] task
-  - [string] hexColor (hex color format)
-  - [date] initialDate
-  - [date] finalDate
-  - [string] description
-  - [bool] isChecked
+### `GET` /tasks?initialDate=<yyyy/mm/dd>T00%3A00%3A00.000Z&finalDate=<yyyy/mm/dd>T23%3A59%3A59.000Z
 
-[delete]task/:id
+### `PUT` /task/:id
+
+- task `string`
+- category `object` `{ [string]name, [string]hexColor }`
+- initialDate `date`
+- finalDate `date`
+- description `string`
+- subTasks `array` `{ task: string, checked: boolean }`
+- isChecked `boolean`
+
+### `DELETE` /task/:id
 
 ## Author
 
-<img src="./public/MyImage.jpeg" width="22%">
+<img name='my-image' src="https://media.licdn.com/dms/image/D4D03AQFdLhogHwQVog/profile-displayphoto-shrink_800_800/0/1672976913935?e=1698883200&v=beta&t=ZAnMJaP-tyQYjdVQWRZbWGKN3jf-zKqIV4J2sH1pTPU" width="22%">
 
 ### _Igor Sprovieri Pereira_
 
-In 2013 I learned to programming games how as a hobbie, in 2020 I started to work on this area, I did some freelancers, opened my game studio and I was a writter for over a year on site crieseusjogos.com. In 2022 I decided to go a web developer professional and today I am fullstack with react and node
+After work 3 years with Unity Developer, I migrated to the web full stack development and actually I have fullstack knowledge. I have a library too, inspired in React, named Frag Components.
