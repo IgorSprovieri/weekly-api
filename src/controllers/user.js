@@ -4,26 +4,6 @@ const tasksList = require("../models/tasks");
 const validation = require("../libs/validation");
 
 class userController {
-  async get(req, res) {
-    try {
-      const id = req.userId;
-
-      if (!id || !validation.validateIdObject(id)) {
-        return res.status(400).json({ error: "id is invalid" });
-      }
-
-      const userFound = await usersList.findById(id);
-
-      return res.status(200).json({
-        user_id: userFound._id,
-        name: userFound.name,
-        email: userFound.email,
-      });
-    } catch (error) {
-      return res.status(500).json({ error: error?.message });
-    }
-  }
-
   async post(req, res) {
     try {
       const { name, email, password } = req.body;
@@ -64,34 +44,21 @@ class userController {
     }
   }
 
-  async delete(req, res) {
+  async get(req, res) {
     try {
       const id = req.userId;
-      const password = req.body.password;
 
       if (!id || !validation.validateIdObject(id)) {
         return res.status(400).json({ error: "Id is invalid" });
       }
 
-      if (!password || !validation.validatePassword(password)) {
-        return res.status(401).json({ error: "Password is invalid" });
-      }
-
       const userFound = await usersList.findById(id);
 
-      const checkPassword = await bcrypt.compareSync(
-        password,
-        userFound.passwordHash
-      );
-
-      if (!checkPassword) {
-        return res.status(401).json({ error: "Password is invalid" });
-      }
-
-      await usersList.findByIdAndRemove(id);
-      await tasksList.deleteMany({ user_id: id });
-
-      return res.status(200).json({ success: true });
+      return res.status(200).json({
+        user_id: userFound._id,
+        name: userFound.name,
+        email: userFound.email,
+      });
     } catch (error) {
       return res.status(500).json({ error: error?.message });
     }
@@ -134,6 +101,39 @@ class userController {
         name: updatedUser.name,
         email: updatedUser.email,
       });
+    } catch (error) {
+      return res.status(500).json({ error: error?.message });
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      const id = req.userId;
+      const password = req.body.password;
+
+      if (!id || !validation.validateIdObject(id)) {
+        return res.status(400).json({ error: "Id is invalid" });
+      }
+
+      if (!password || !validation.validatePassword(password)) {
+        return res.status(401).json({ error: "Password is invalid" });
+      }
+
+      const userFound = await usersList.findById(id);
+
+      const checkPassword = await bcrypt.compareSync(
+        password,
+        userFound.passwordHash
+      );
+
+      if (!checkPassword) {
+        return res.status(401).json({ error: "Password is invalid" });
+      }
+
+      await usersList.findByIdAndRemove(id);
+      await tasksList.deleteMany({ user_id: id });
+
+      return res.status(200).json({ success: true });
     } catch (error) {
       return res.status(500).json({ error: error?.message });
     }
