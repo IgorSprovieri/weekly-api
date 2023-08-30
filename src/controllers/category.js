@@ -26,6 +26,18 @@ class categoryController {
       return res.status(500).json({ error: error?.message });
     }
   }
+
+  async get(req, res) {
+    try {
+      const userId = req.userId;
+
+      const categories = await categoriesList.find({ user_id: userId });
+
+      return res.status(200).json(categories);
+    } catch (error) {
+      return res.status(500).json({ error: error?.message });
+    }
+  }
 }
 
 module.exports = new categoryController();
