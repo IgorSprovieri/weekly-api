@@ -36,7 +36,7 @@ https://github.com/IgorSprovieri/weekly-api/blob/main/insomnia.json
 1- Clone the repo:
 
 ```
-git clone https://github.com/IgorSprovieri/Weekly
+git clone https://github.com/IgorSprovieri/weekly-api
 ```
 
 2- Create DB on docker:
@@ -54,7 +54,7 @@ http://localhost:27017
 4- Navigate to the repository:
 
 ```
-cd Weekly
+cd weekly-api
 ```
 
 5- Install the dependencies:
