@@ -9,7 +9,7 @@ const { connectDatabase, colorsSeed } = require("./db");
 const app = express();
 
 const corsOptions = {
-  origin: "https://weekly.ispapps.com",
+  origin: process.env.CORS_URL,
 };
 
 app.use(cors(enviroment === "prod" ? corsOptions : "*"));
