@@ -29,6 +29,8 @@ router.delete("/user", userController.delete);
 
 router.post("/category", categoryController.post);
 router.get("/categories", categoryController.get);
+router.put("/category/:id", categoryController.put);
+router.delete("/category/:id", categoryController.delete);
 
 router.get("/task", taskController.get);
 router.post("/task", taskController.post);
