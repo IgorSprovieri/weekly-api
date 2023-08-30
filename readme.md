@@ -203,4 +203,4 @@ To reset the password, the API send a email with a token. For this system work, 
 
 ### _Igor Sprovieri Pereira_
 
-After work 3 years with Unity Developer, I migrated to the web full stack development and actually I have fullstack knowledge. I have a library too, inspired in React, named Frag Components.
+After work 3 years with Unity Developer, I migrated to the web full stack development and actually I have fullstack knowledge. I also have a library, inspired in React, named Frag Components.
