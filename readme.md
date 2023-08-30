@@ -154,36 +154,26 @@ To reset the password, the API send a email with a token. For this system work, 
 
 ### `DELETE` /user
 
-```
 - password `string` `six numbers format`
-```
 
 ### `POST` /category
 
-```
 - name `string` `required`
 - hexColor `string` `required` `hex color format`
-```
 
 ### `GET` /categories
 
-```
 - name `string` `required`
 - hexColor `string` `required` `hex color format`
-```
 
 ### `PUT` /category/:id
 
-```
 - name `string`
 - hexColor `string` `hex color format`
-```
 
 ### `DELETE` /category/:id
 
 ### `POST` /task
-
-```
 
 - task `string`
 - category `object` `required` `{ [string]name, [string]hexColor }`
@@ -192,7 +182,6 @@ To reset the password, the API send a email with a token. For this system work, 
 - description `string`
 - subTasks `array` `required` `{ task: string, checked: boolean }`
 - isChecked `boolean`
-```
 
 ### `GET` /tasks?initialDate=<yyyy/mm/dd>T00%3A00%3A00.000Z&finalDate=<yyyy/mm/dd>T23%3A59%3A59.000Z
 
