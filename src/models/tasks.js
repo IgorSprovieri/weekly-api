@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
 
+const subTaskSchema = new mongoose.Schema(
+  { task: String, checked: Boolean },
+  { _id: false }
+);
+
 const taskListSchema = new mongoose.Schema({
   user_id: mongoose.Types.ObjectId,
   task: { type: String, default: " " },
@@ -7,7 +12,7 @@ const taskListSchema = new mongoose.Schema({
   initialDate: Date,
   finalDate: Date,
   description: { type: String, default: " " },
-  subTasks: { type: [{ task: String, checked: Boolean }], default: [] },
+  subTasks: [subTaskSchema],
   checked: { type: Boolean, default: false },
 });
 
