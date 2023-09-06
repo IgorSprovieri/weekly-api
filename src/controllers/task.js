@@ -9,10 +9,8 @@ class taskController {
       const { initialDate, finalDate } = req.body;
       const { task, category, description, subTasks, checked } = req.body;
 
-      if (!category?.name || category?.hexColor) {
-        if (!validation.validateHexColor(category.hexColor)) {
-          return res.status(400).json({ error: "Category is invalid" });
-        }
+      if (!category?.name || !category?.hexColor) {
+        return res.status(400).json({ error: "Category is invalid" });
       }
 
       if (!validation.validateHexColor(category.hexColor)) {
@@ -28,7 +26,7 @@ class taskController {
       }
 
       if (subTasks && subTasks.length > 0) {
-        subTasks.forEach((subTask) => {
+        subTasks?.forEach((subTask) => {
           if (!subTask?.task || !subTask?.checked) {
             return res.status(400).json({ error: "Subtask is invalid" });
           }
@@ -131,10 +129,8 @@ class taskController {
       }
 
       if (category) {
-        if (!category?.name || category?.hexColor) {
-          if (!validation.validateHexColor(category.hexColor)) {
-            return res.status(400).json({ error: "Category is invalid" });
-          }
+        if (!category?.name || !category?.hexColor) {
+          return res.status(400).json({ error: "Category is invalid" });
         }
 
         if (!validation.validateHexColor(category.hexColor)) {
@@ -161,11 +157,11 @@ class taskController {
       }
 
       if (subTasks && subTasks.length > 0) {
-        if (!subTasks.task || !subTasks.checked) {
-          return res.status(400).json({ error: "Subtask is invalid" });
-        }
-
         subTasks?.forEach((subTask) => {
+          if (!subTask.task || !subTask.checked) {
+            return res.status(400).json({ error: "Subtask is invalid" });
+          }
+
           if (!validation.validateBool(subTask?.checked)) {
             return res
               .status(400)
