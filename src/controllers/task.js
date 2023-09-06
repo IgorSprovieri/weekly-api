@@ -27,14 +27,12 @@ class taskController {
 
       if (subTasks && subTasks.length > 0) {
         subTasks?.forEach((subTask) => {
-          if (!subTask?.task || !subTask?.checked) {
+          if (!subTask?.task) {
             return res.status(400).json({ error: "Subtask is invalid" });
           }
 
           if (!validation.validateBool(subTask.checked)) {
-            return res
-              .status(400)
-              .json({ error: "Subtask checked is invalid" });
+            return res.status(400).json({ error: "Subtask is invalid" });
           }
         });
       }
@@ -158,14 +156,12 @@ class taskController {
 
       if (subTasks && subTasks.length > 0) {
         subTasks?.forEach((subTask) => {
-          if (!subTask.task || !subTask.checked) {
+          if (!subTask?.task) {
             return res.status(400).json({ error: "Subtask is invalid" });
           }
 
-          if (!validation.validateBool(subTask?.checked)) {
-            return res
-              .status(400)
-              .json({ error: "Subtask checked is invalid" });
+          if (!validation.validateBool(subTask.checked)) {
+            return res.status(400).json({ error: "Subtask is invalid" });
           }
         });
       }
