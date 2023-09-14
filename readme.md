@@ -4,17 +4,37 @@
 
 Weekly it's a task manager API that include:
 
-- Users and login system
+- Users and login system with JWT
 - Create, read, update and delete tasks
 - Create, read, update and delete categories to use in your tasks
 - Get predefined colors to use in your categories
 
+## Live Application
+
+```
+https://api.weekly.ispapps.com
+```
+
+This api was deploed with Railway
+
+## Documentation
+
+- 1. Use insomnia to open the file below:
+
+```
+https://github.com/IgorSprovieri/weekly-api/blob/main/insomnia.json
+```
+
+- 2. Read the docs: [Weekly API Docs](#routes)
+
+```
+Read the docs to use the API
+```
+
 ## Used Tecnologies
 
-- Node
 - Express
 - Mongoose
-- Docker
 
 ## Main Concepts Applied
 
@@ -25,31 +45,10 @@ Weekly it's a task manager API that include:
 - Middlewares
 - Email Provider
 
-## Documentation
-
-- 1. Use insomnia to open the file below:
-
-```
-https://github.com/IgorSprovieri/weekly-api/blob/main/insomnia.json
-```
-
-- 2. Live Application: [api.weekly.ispapps.com](https://api.weekly.ispapps.com)
-
-```
-Use this live application to test on insomnia
-```
-
-- 3. Read the docs: [Weekly API Docs](#routes)
-
-```
-Read the docs to use the API
-```
-
 ## Requirements To Run
 
 - Node.js (<a href="https://nodejs.org/en/">nodejs.org/en</a>)
 - Docker (<a href="https://www.docker.com">www.docker.com</a>)
-- Mailjet Account (<a href="https://app.mailjet.com/">app.mailjet.com</a>)
 
 ## Getting Started
 
@@ -65,25 +64,19 @@ git clone https://github.com/IgorSprovieri/weekly-api
 docker run --name weekly -p 27017:27017 -d mongo
 ```
 
-3- Open the mongoDB compass and add DB:
-
-```
-http://localhost:27017
-```
-
-4- Navigate to the repository:
+3- Navigate to the repository:
 
 ```
 cd weekly-api
 ```
 
-5- Install the dependencies:
+4- Install the dependencies:
 
 ```
 npm install
 ```
 
-6 - Create .env following example:
+5 - Create .env following example:
 
 </br>ENVIROMENT=dev
 </br>CORS_URL=\*
@@ -109,7 +102,11 @@ npm run start
 npm run start:dev
 ```
 
-## Config Forgot/Reset Password Email
+## Config Forgot/Reset Password Email (Optional)
+
+### Requirement
+
+- Mailjet Account (<a href="https://app.mailjet.com/">app.mailjet.com</a>)
 
 To reset the password, the API send a email with a token. For this system work, you need to config some things:
 
@@ -223,4 +220,4 @@ To reset the password, the API send a email with a token. For this system work, 
 
 ### _Igor Sprovieri Pereira_
 
-After work 3 years with Unity Developer, I migrated to the web full stack development and actually I have fullstack knowledge. I also have a library, inspired in React, named Frag Components.
+After working as a Unity developer for 3 years, I migrated to the web development area and currently have Fullstack knowledge with React and Node. I have an app for the Apple Store and Google Play and a library for creating web pages inspired by React.
