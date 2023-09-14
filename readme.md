@@ -216,7 +216,7 @@ To reset the password, the API send a email with a token. For this system work, 
 
 ## Author
 
-<img classname='my-image' src="https://media.licdn.com/dms/image/D4D03AQFdLhogHwQVog/profile-displayphoto-shrink_800_800/0/1672976913935?e=1698883200&v=beta&t=ZAnMJaP-tyQYjdVQWRZbWGKN3jf-zKqIV4J2sH1pTPU" width="22%">
+<img src="https://media.licdn.com/dms/image/D4D03AQFdLhogHwQVog/profile-displayphoto-shrink_800_800/0/1672976913935?e=1700092800&v=beta&t=wpMCLFnfgmrz3HXW-y9AdaXBSWw7gstVsPHTtTgcyuU" alt="Igor Sprovieri" style="width: 30%; border-radius: 50px;">
 
 ### _Igor Sprovieri Pereira_
 
