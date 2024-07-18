@@ -1,9 +1,9 @@
-const appColorsList = require("../models/colors");
+const colorsModel = require("../models/colors");
 
 class colorController {
   async get(req, res) {
     try {
-      const colors = await appColorsList.find();
+      const colors = await colorsModel.find();
 
       return res.status(200).json(colors);
     } catch (error) {

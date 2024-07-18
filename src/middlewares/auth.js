@@ -1,29 +1,25 @@
-const jwt = require("jsonwebtoken");
-const usersList = require("../models/users");
+const { firebaseAuth } = require("../libs/firebase");
 
-const auth = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+class AuthMiddleware {
+  async validate(req, res, next) {
+    const authHeader = req.headers.authorization;
 
-  if (!authHeader) {
-    return res.status(401).json({ error: "Token not provided" });
-  }
-
-  const token = authHeader.split(" ")[1];
-
-  try {
-    const decoded = await jwt.verify(token, process.env.JWT_HASH);
-
-    const userFound = await usersList.findById(decoded?.userId);
-    if (!userFound) {
-      return res.status(404).json({ error: "User not found" });
+    if (!authHeader) {
+      return res.status(401).json({ error: "Token not provided" });
     }
 
-    req.userId = decoded?.userId;
+    const token = authHeader.split(" ")[1];
 
-    next();
-  } catch (error) {
-    return res.status(401).json({ error: "Invalid Token" });
+    try {
+      const user = await firebaseAuth.validateToken(token);
+
+      req.user = user;
+
+      next();
+    } catch (error) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
   }
-};
+}
 
-module.exports = auth;
+module.exports = new AuthMiddleware();

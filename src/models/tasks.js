@@ -5,10 +5,10 @@ const subTaskSchema = new mongoose.Schema(
   { _id: false }
 );
 
-const taskListSchema = new mongoose.Schema({
-  user_id: mongoose.Types.ObjectId,
+const taskSchema = new mongoose.Schema({
+  uid: String,
   task: { type: String, default: " " },
-  category: { name: String, hexColor: String },
+  hexColor: { type: String, default: "#39526C" },
   initialDate: Date,
   finalDate: Date,
   description: { type: String, default: " " },
@@ -16,4 +16,4 @@ const taskListSchema = new mongoose.Schema({
   checked: { type: Boolean, default: false },
 });
 
-module.exports = mongoose.model("tasks", taskListSchema);
+module.exports = mongoose.model("tasks", taskSchema);
