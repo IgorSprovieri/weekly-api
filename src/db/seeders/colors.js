@@ -1,7 +1,7 @@
 const colors = require("../../models/colors");
 
 const colorsSeed = {
-  model: colors,
+  list: colors,
   values: [
     {
       hexColor: "#FFFFFF",

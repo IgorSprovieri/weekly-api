@@ -1,10 +1,11 @@
 const validation = require("../libs/validation");
-const tasksModel = require("../models/tasks");
+const categories = require("../models/categories");
+const tasksList = require("../models/tasks");
 
 class taskController {
   async post(req, res) {
     try {
-      const { uid } = req.user;
+      const userId = req.userId;
       const { initialDate, finalDate } = req.body;
       const { task, category, description, subTasks, checked } = req.body;
 
@@ -55,8 +56,8 @@ class taskController {
         return res.status(400).json({ error: "The task overcomming the day" });
       }
 
-      const newTask = await tasksModel.create({
-        uid: uid,
+      const newTask = await tasksList.create({
+        user_id: userId,
         category: category,
         task: task,
         initialDate: initialDate,
@@ -74,7 +75,7 @@ class taskController {
 
   async get(req, res) {
     try {
-      const { uid } = req.user;
+      const userId = req.userId;
       const { initialDate, finalDate } = req.query;
       let initialDateTest = new Date(initialDate).toISOString;
       let finalDateTest = new Date(finalDate).toISOString;
@@ -93,9 +94,9 @@ class taskController {
           .json({ error: "Final date must be greater than start date" });
       }
 
-      const tasks = await tasksModel
+      const tasks = await tasksList
         .find({
-          uid: uid,
+          user_id: userId,
           initialDate: {
             $gte: initialDate,
             $lt: finalDate,
@@ -119,7 +120,7 @@ class taskController {
       const { task, category, hexColor, description, subTasks, checked } =
         req.body;
       const id = req.params.id;
-      const { uid } = req.user;
+      const userId = req.userId;
 
       if (!id || !validation.validateIdObject(id)) {
         return res.status(400).json({ error: "Id is invalid" });
@@ -171,17 +172,17 @@ class taskController {
         }
       }
 
-      const taskFound = await tasksModel.findById(id);
+      const taskFound = await tasksList.findById(id);
 
       if (!taskFound) {
         return res.status(404).json({ error: "Task not found" });
       }
 
-      if (!taskFound.uid.equals(uid)) {
+      if (!taskFound.user_id.equals(userId)) {
         return res.status(401).json({ error: "Aceess denied" });
       }
 
-      const updatedTask = await tasksModel.findByIdAndUpdate(
+      const updatedTask = await tasksList.findByIdAndUpdate(
         id,
         {
           task: task,
@@ -204,24 +205,23 @@ class taskController {
   async delete(req, res) {
     try {
       const id = req.params.id;
-      const { uid } = req.user;
+      const userId = req.userId;
 
       if (!id || !validation.validateIdObject(id)) {
         return res.status(400).json({ error: "Id is invalid" });
       }
 
-      const taskFound = await tasksModel.findById(id);
+      const taskFound = await tasksList.findById(id);
 
       if (!taskFound) {
         return res.status(404).json({ error: "Task not found" });
       }
 
-      if (!taskFound.uid.equals(uid)) {
+      if (!taskFound.user_id.equals(userId)) {
         return res.status(401).json({ error: "Aceess denied" });
       }
 
-      const deletedTask = await tasksModel.findByIdAndRemove(id);
-
+      const deletedTask = await tasksList.findByIdAndRemove(id);
       return res.status(200).json(deletedTask);
     } catch (error) {
       return res.status(500).json({ error: error?.message });
