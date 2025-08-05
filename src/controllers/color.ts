@@ -1,7 +1,8 @@
-const colorsModel = require("../models/colors");
+import { colorsModel } from "../models/colors";
+import type { Request, Response } from "express";
 
 class ColorController {
-  async get(req, res) {
+  async get(req: Request, res: Response) {
     try {
       const colors = await colorsModel.find();
 
@@ -12,4 +13,4 @@ class ColorController {
   }
 }
 
-module.exports = new ColorController();
+export const colorController = new ColorController();

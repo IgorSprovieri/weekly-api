@@ -1,22 +1,26 @@
-const usersModel = require("../models/users");
-const validation = require("../libs/validation");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const randomToken = require("random-token");
-const Mail = require("../libs/Mail");
-const DateFNS = require("date-fns");
-const commonErrors = require("../libs/commonErrors");
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+
+import { mail } from "../libs/mail";
+import { validations } from "../libs/validation";
+import { usersModel } from "../models/users";
+import { differenceInMinutes } from "date-fns";
+import { commonErrors } from "../libs/commonErrors";
+import { randomToken } from "../libs/randomToken";
+
+import type { Request, Response } from "express";
+import { enviroment } from "../config/enviroment";
 
 class SessionController {
-  async login(req, res) {
+  async login(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
 
-      if (!email || !validation.validateEmail(email)) {
+      if (!email || !validations.validateEmail(email)) {
         return res.status(403).json({ error: "E-mail or password is invalid" });
       }
 
-      if (!password || !validation.validatePassword(password)) {
+      if (!password || !validations.validatePassword(password)) {
         return res.status(403).json({ error: "E-mail or password is invalid" });
       }
 
@@ -27,14 +31,14 @@ class SessionController {
 
       const checkPassword = await bcrypt.compareSync(
         password,
-        userFound.passwordHash
+        userFound.passwordHash || ""
       );
 
       if (!checkPassword) {
         return res.status(403).json({ error: "E-mail or password is invalid" });
       }
 
-      const token = jwt.sign({ userId: userFound._id }, process.env.JWT_HASH, {
+      const token = jwt.sign({ userId: userFound._id }, enviroment.JWT_HASH, {
         expiresIn: "7d",
       });
 
@@ -49,11 +53,11 @@ class SessionController {
     }
   }
 
-  async forgotPassword(req, res) {
+  async forgotPassword(req: Request, res: Response) {
     try {
       const email = req.body.email;
 
-      if (!email || !validation.validateEmail(email)) {
+      if (!email || !validations.validateEmail(email)) {
         return res.status(400).json({ error: "E-mail or password is invalid" });
       }
 
@@ -62,7 +66,7 @@ class SessionController {
         return res.status(404).json({ error: "User not found" });
       }
 
-      const resetPasswordToken = randomToken(6);
+      const resetPasswordToken = randomToken({ length: 6 });
       const resetPasswordTokenHash = bcrypt.hashSync(resetPasswordToken, 10);
 
       await usersModel.findByIdAndUpdate(userFound._id, {
@@ -70,11 +74,11 @@ class SessionController {
         resetPasswordTokenCratedAt: Date.now(),
       });
 
-      Mail.sendForgotPasswordEmail(
-        userFound.email,
-        userFound.name,
-        resetPasswordToken
-      );
+      mail.sendForgotPasswordEmail({
+        name: userFound.name,
+        email: email,
+        token: resetPasswordToken,
+      });
 
       return res.status(200).json({ sucess: true });
     } catch (error) {
@@ -82,19 +86,19 @@ class SessionController {
     }
   }
 
-  async resetPassword(req, res) {
+  async resetPassword(req: Request, res: Response) {
     try {
-      const { token, email, password } = body.token;
+      const { token, email, password } = req.body.token;
 
       if (!token) {
         return res.status(400).json({ error: "Token is missing" });
       }
 
-      if (!password || !validation.validatePassword(password)) {
+      if (!password || !validations.validatePassword(password)) {
         return res.status(400).json({ error: "E-mail or password is invalid" });
       }
 
-      if (!email || !validation.validateEmail(email)) {
+      if (!email || !validations.validateEmail(email)) {
         return res.status(400).json({ error: "E-mail or password is invalid" });
       }
 
@@ -109,7 +113,7 @@ class SessionController {
       );
 
       const isValidToken = () => {
-        const timeDifference = DateFNS.differenceInMinutes(
+        const timeDifference = differenceInMinutes(
           userFound.resetPasswordTokenCratedAt,
           Date.now()
         );
@@ -134,4 +138,4 @@ class SessionController {
   }
 }
 
-module.exports = new SessionController();
+export const sessionController = new SessionController();

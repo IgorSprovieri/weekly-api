@@ -1,9 +1,12 @@
-const commonErrors = require("../libs/commonErrors");
-const validation = require("../libs/validation");
-const tasksModel = require("../models/tasks");
+import { validations } from "../libs/validation";
+import { commonErrors } from "../libs/commonErrors";
+import { SubTask, tasksModel } from "../models/tasks";
 
-class taskController {
-  async post(req, res) {
+import type { Response } from "express";
+import type { AuthRequest } from "../middlewares/auth";
+
+class TaskController {
+  async post(req: AuthRequest, res: Response) {
     try {
       const userId = req.userId;
 
@@ -14,32 +17,32 @@ class taskController {
         return res.status(400).json({ error: "Category is invalid" });
       }
 
-      if (!validation.validateHexColor(category.hexColor)) {
+      if (!validations.validateHexColor(category.hexColor)) {
         return res.status(400).json({ error: "Category color is invalid" });
       }
 
-      if (!initialDate || !validation.validateDate(initialDate)) {
+      if (!initialDate || !validations.validateDate(initialDate)) {
         return res.status(400).json({ error: "Initial date is invalid" });
       }
 
-      if (!finalDate || !validation.validateDate(finalDate)) {
+      if (!finalDate || !validations.validateDate(finalDate)) {
         return res.status(400).json({ error: "Final date is invalid" });
       }
 
       if (subTasks && subTasks.length > 0) {
-        subTasks?.forEach((subTask) => {
+        subTasks?.forEach((subTask: SubTask) => {
           if (!subTask?.task) {
             return res.status(400).json({ error: "Subtask is invalid" });
           }
 
-          if (!validation.validateBool(subTask.checked)) {
+          if (!validations.validateBool(subTask?.checked)) {
             return res.status(400).json({ error: "Subtask is invalid" });
           }
         });
       }
 
       if (checked) {
-        if (!validation.validateBool(checked)) {
+        if (!validations.validateBool(checked)) {
           return res.status(400).json({ error: "Checked is invalid" });
         }
       }
@@ -74,19 +77,19 @@ class taskController {
     }
   }
 
-  async get(req, res) {
+  async get(req: AuthRequest, res: Response) {
     try {
       const userId = req.userId;
       const { initialDate, finalDate } = req.query;
 
-      let initialDateTest = new Date(initialDate).toISOString;
-      let finalDateTest = new Date(finalDate).toISOString;
+      let initialDateTest = new Date(String(initialDate)).toISOString;
+      let finalDateTest = new Date(String(finalDate)).toISOString;
 
-      if (!initialDate || !validation.validateDate(initialDate)) {
+      if (!initialDate || !validations.validateDate(String(initialDate))) {
         return res.status(400).json({ error: "Initial date is invalid" });
       }
 
-      if (!finalDate || !validation.validateDate(finalDate)) {
+      if (!finalDate || !validations.validateDate(String(finalDate))) {
         return res.status(400).json({ error: "Final date is invalid" });
       }
 
@@ -104,19 +107,16 @@ class taskController {
             $lt: finalDate,
           },
         })
+        .sort({ initialDate: 1 })
         .exec();
 
-      const sortedTasks = tasks.sort((n1, n2) => {
-        return n1.initialDate - n2.initialDate;
-      });
-
-      return res.status(200).json(sortedTasks);
+      return res.status(200).json(tasks);
     } catch (error) {
       return commonErrors.internalServerError({ res });
     }
   }
 
-  async put(req, res) {
+  async put(req: AuthRequest, res: Response) {
     try {
       const { initialDate, finalDate } = req.body;
       const { task, category, hexColor, description, subTasks, checked } =
@@ -125,7 +125,7 @@ class taskController {
       const id = req.params.id;
       const userId = req.userId;
 
-      if (!id || !validation.validateIdObject(id)) {
+      if (!id || !validations.validateIdObject(id)) {
         return res.status(400).json({ error: "Id is invalid" });
       }
 
@@ -134,43 +134,43 @@ class taskController {
           return res.status(400).json({ error: "Category is invalid" });
         }
 
-        if (!validation.validateHexColor(category.hexColor)) {
+        if (!validations.validateHexColor(category.hexColor)) {
           return res.status(400).json({ error: "Category color is invalid" });
         }
       }
 
       if (initialDate) {
-        if (!validation.validateDate(initialDate)) {
+        if (!validations.validateDate(initialDate)) {
           return res.status(400).json({ error: "Initial date is invalid" });
         }
       }
 
       if (finalDate) {
-        if (!validation.validateDate(finalDate)) {
+        if (!validations.validateDate(finalDate)) {
           return res.status(400).json({ error: "Final date is invalid" });
         }
       }
 
       if (hexColor) {
-        if (!validation.validateHexColor(hexColor)) {
+        if (!validations.validateHexColor(hexColor)) {
           return res.status(400).json({ error: "Hex color is invalid" });
         }
       }
 
       if (subTasks && subTasks.length > 0) {
-        subTasks?.forEach((subTask) => {
+        subTasks?.forEach((subTask: SubTask) => {
           if (!subTask?.task) {
             return res.status(400).json({ error: "Subtask is invalid" });
           }
 
-          if (!validation.validateBool(subTask.checked)) {
+          if (!validations.validateBool(subTask.checked)) {
             return res.status(400).json({ error: "Subtask is invalid" });
           }
         });
       }
 
       if (checked) {
-        if (!validation.validateBool(checked)) {
+        if (!validations.validateBool(checked)) {
           return res.status(400).json({ error: "Final date is invalid" });
         }
       }
@@ -181,7 +181,7 @@ class taskController {
         return commonErrors.notFound({ res, nameInLowerCase: "task" });
       }
 
-      if (!taskFound.user_id.equals(userId)) {
+      if (taskFound.user_id !== userId) {
         return commonErrors.forbidden({ res, nameInLowerCase: "task" });
       }
 
@@ -205,12 +205,12 @@ class taskController {
     }
   }
 
-  async delete(req, res) {
+  async delete(req: AuthRequest, res: Response) {
     try {
       const id = req.params.id;
       const userId = req.userId;
 
-      if (!id || !validation.validateIdObject(id)) {
+      if (!id || !validations.validateIdObject(id)) {
         return res.status(400).json({ error: "Id is invalid" });
       }
 
@@ -220,7 +220,7 @@ class taskController {
         return commonErrors.notFound({ res, nameInLowerCase: "task" });
       }
 
-      if (!taskFound.user_id.equals(userId)) {
+      if (taskFound.user_id !== userId) {
         return commonErrors.forbidden({ res, nameInLowerCase: "task" });
       }
 
@@ -232,4 +232,4 @@ class taskController {
   }
 }
 
-module.exports = new taskController();
+export const taskController = new TaskController();

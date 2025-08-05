@@ -1,9 +1,12 @@
-const commonErrors = require("../libs/commonErrors");
-const validation = require("../libs/validation");
-const categoriesModel = require("../models/categories");
+import { validations } from "../libs/validation";
+import { commonErrors } from "../libs/commonErrors";
+import { categoriesModel } from "../models/categories";
+
+import type { Response } from "express";
+import type { AuthRequest } from "../middlewares/auth";
 
 class CategoryController {
-  async post(req, res) {
+  async post(req: AuthRequest, res: Response) {
     try {
       const userId = req.userId;
       const { name, hexColor } = req.body;
@@ -12,7 +15,7 @@ class CategoryController {
         return res.status(400).json({ error: "Category name is required" });
       }
 
-      if (!hexColor || !validation.validateHexColor(hexColor)) {
+      if (!hexColor || !validations.validateHexColor(hexColor)) {
         return res.status(400).json({ error: "hexColor is invalid" });
       }
 
@@ -28,7 +31,7 @@ class CategoryController {
     }
   }
 
-  async get(req, res) {
+  async get(req: AuthRequest, res: Response) {
     try {
       const userId = req.userId;
 
@@ -40,13 +43,13 @@ class CategoryController {
     }
   }
 
-  async put(req, res) {
+  async put(req: AuthRequest, res: Response) {
     try {
       const id = req.params.id;
       const userId = req.userId;
       const { name, hexColor } = req.body;
 
-      if (hexColor && !validateHexColor(hexColor)) {
+      if (hexColor && !validations.validateHexColor(hexColor)) {
         return res.status(400).json({ error: "hexColor is invalid" });
       }
 
@@ -56,7 +59,7 @@ class CategoryController {
         return commonErrors.notFound({ res, nameInLowerCase: "category" });
       }
 
-      if (!categoryFound.user_id.equals(userId)) {
+      if (categoryFound?.user_id === userId) {
         return commonErrors.forbidden({ res, nameInLowerCase: "category" });
       }
 
@@ -77,7 +80,7 @@ class CategoryController {
     }
   }
 
-  async delete(req, res) {
+  async delete(req: AuthRequest, res: Response) {
     try {
       const id = req.params.id;
       const userId = req.userId;
@@ -88,7 +91,7 @@ class CategoryController {
         return commonErrors.notFound({ res, nameInLowerCase: "category" });
       }
 
-      if (!categoryFound.user_id.equals(userId)) {
+      if (categoryFound?.user_id === userId) {
         return commonErrors.forbidden({ res, nameInLowerCase: "category" });
       }
 
@@ -101,4 +104,4 @@ class CategoryController {
   }
 }
 
-module.exports = new CategoryController();
+export const categoryController = new CategoryController();

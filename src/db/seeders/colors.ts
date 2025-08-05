@@ -1,12 +1,9 @@
-const { Seeder } = require(".");
-const colors = require("../../models/colors");
+import { Seeder } from "./Seeder";
+import { colorsModel } from "../../models/colors";
 
-class ColorsSeed extends Seeder {
-  #model;
-  values;
-
+class ColorsSeed extends Seeder<{ hexColor?: string }> {
   constructor() {
-    const model = colors;
+    const model = colorsModel;
     const values = [
       {
         hexColor: "#FFFFFF",
@@ -38,4 +35,4 @@ class ColorsSeed extends Seeder {
   }
 }
 
-module.exports = new ColorsSeed();
+export const colorsSeed = new ColorsSeed();

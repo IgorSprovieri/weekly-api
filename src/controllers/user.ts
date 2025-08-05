@@ -1,10 +1,14 @@
-const bcrypt = require("bcrypt");
-const usersModel = require("../models/users");
-const tasksModel = require("../models/tasks");
-const validation = require("../libs/validation");
+import bcrypt from "bcrypt";
 
-class userController {
-  async post(req, res) {
+import { validations } from "../libs/validation";
+import { usersModel } from "../models/users";
+import { tasksModel } from "../models/tasks";
+
+import type { Request, Response } from "express";
+import type { AuthRequest } from "../middlewares/auth";
+
+class UserController {
+  async post(req: Request, res: Response) {
     try {
       const { name, email, password } = req.body;
 
@@ -12,11 +16,11 @@ class userController {
         return res.status(400).json({ error: "Name is required" });
       }
 
-      if (!email || !validation.validateEmail(email)) {
+      if (!email || !validations.validateEmail(email)) {
         return res.status(400).json({ error: "E-mail is invalid" });
       }
 
-      if (!password || !validation.validatePassword(password)) {
+      if (!password || !validations.validatePassword(password)) {
         return res.status(400).json({ error: "Password is invalid" });
       }
 
@@ -44,37 +48,37 @@ class userController {
     }
   }
 
-  async get(req, res) {
+  async get(req: AuthRequest, res: Response) {
     try {
       const id = req.userId;
 
-      if (!id || !validation.validateIdObject(id)) {
+      if (!id || !validations.validateIdObject(id)) {
         return res.status(400).json({ error: "Id is invalid" });
       }
 
       const userFound = await usersModel.findById(id);
 
       return res.status(200).json({
-        user_id: userFound._id,
-        name: userFound.name,
-        email: userFound.email,
+        user_id: userFound?._id,
+        name: userFound?.name,
+        email: userFound?.email,
       });
     } catch (error) {
       return res.status(500).json("Internal server error");
     }
   }
 
-  async put(req, res) {
+  async put(req: AuthRequest, res: Response) {
     try {
       const id = req.userId;
-      const { name, email } = req.body;
+      const { name, email: newEmail } = req.body;
 
-      if (!id || !validation.validateIdObject(id)) {
+      if (!id || !validations.validateIdObject(id)) {
         return res.status(400).json({ error: "Id is invalid" });
       }
 
-      if (email) {
-        if (!validation.validateEmail(email)) {
+      if (newEmail) {
+        if (!validations.validateEmail(newEmail)) {
           return res.status(400).json({ error: "E-mail is invalid" });
         }
 
@@ -89,7 +93,7 @@ class userController {
         id,
         {
           name: name,
-          email: email,
+          email: newEmail,
         },
         {
           new: true,
@@ -97,25 +101,25 @@ class userController {
       );
 
       return res.status(200).json({
-        id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
+        id: updatedUser?._id,
+        name: updatedUser?.name,
+        email: updatedUser?.email,
       });
     } catch (error) {
       return res.status(500).json("Internal server error");
     }
   }
 
-  async delete(req, res) {
+  async delete(req: AuthRequest, res: Response) {
     try {
       const id = req.userId;
       const password = req.body.password;
 
-      if (!id || !validation.validateIdObject(id)) {
+      if (!id || !validations.validateIdObject(id)) {
         return res.status(400).json({ error: "Id is invalid" });
       }
 
-      if (!password || !validation.validatePassword(password)) {
+      if (!password || !validations.validatePassword(password)) {
         return res.status(401).json({ error: "Password is invalid" });
       }
 
@@ -123,7 +127,7 @@ class userController {
 
       const checkPassword = await bcrypt.compareSync(
         password,
-        userFound.passwordHash
+        userFound?.passwordHash || ""
       );
 
       if (!checkPassword) {
@@ -140,4 +144,4 @@ class userController {
   }
 }
 
-module.exports = new userController();
+export const userController = new UserController();

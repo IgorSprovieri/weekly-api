@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import { InferSchemaType, model, Schema } from "mongoose";
 
-const usersListSchema = new mongoose.Schema({
+const usersSchema = new Schema({
   name: {
     type: String,
     default: "User Name",
@@ -25,4 +25,6 @@ const usersListSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("users", usersListSchema);
+export type User = InferSchemaType<typeof usersSchema>;
+
+export const usersModel = model("users", usersSchema);
