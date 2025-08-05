@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const categoriesListSchema = mongoose.Schema({
+const categoriesSchema = mongoose.Schema({
   user_id: mongoose.Types.ObjectId,
   name: { type: String },
   hexColor: {
@@ -9,4 +9,4 @@ const categoriesListSchema = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("categories", categoriesListSchema);
+module.exports = mongoose.model("categories", categoriesSchema);

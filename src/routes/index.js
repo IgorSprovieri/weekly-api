@@ -8,7 +8,7 @@ const categoryController = require("../controllers/category");
 const authMiddleware = require("../middlewares/auth");
 
 //------------ Static Routes ----------
-router.get("/", function (req, res) {
+router.get("/", (req, res) => {
   return res.send("It's a task manager API called Weekly");
 });
 

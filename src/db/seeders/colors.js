@@ -38,4 +38,4 @@ class ColorsSeed extends Seeder {
   }
 }
 
-module.exports = { colorsSeed: new ColorsSeed() };
+module.exports = new ColorsSeed();

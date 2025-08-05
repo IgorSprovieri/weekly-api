@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
-const usersList = require("../models/users");
-const tasksList = require("../models/tasks");
+const usersModel = require("../models/users");
+const tasksModel = require("../models/tasks");
 const validation = require("../libs/validation");
 
 class userController {
@@ -20,7 +20,7 @@ class userController {
         return res.status(400).json({ error: "Password is invalid" });
       }
 
-      const alreadyExists = await usersList.exists({ email: email });
+      const alreadyExists = await usersModel.exists({ email: email });
 
       if (alreadyExists) {
         return res.status(400).json({ error: "User already exists" });
@@ -28,7 +28,7 @@ class userController {
 
       const passwordHash = bcrypt.hashSync(password, 10);
 
-      const newUser = await usersList.create({
+      const newUser = await usersModel.create({
         name: name,
         email: email,
         passwordHash: passwordHash,
@@ -40,7 +40,7 @@ class userController {
         email: newUser.email,
       });
     } catch (error) {
-      return res.status(500).json({ error: error?.message });
+      return res.status(500).json("Internal server error");
     }
   }
 
@@ -52,7 +52,7 @@ class userController {
         return res.status(400).json({ error: "Id is invalid" });
       }
 
-      const userFound = await usersList.findById(id);
+      const userFound = await usersModel.findById(id);
 
       return res.status(200).json({
         user_id: userFound._id,
@@ -60,7 +60,7 @@ class userController {
         email: userFound.email,
       });
     } catch (error) {
-      return res.status(500).json({ error: error?.message });
+      return res.status(500).json("Internal server error");
     }
   }
 
@@ -78,14 +78,14 @@ class userController {
           return res.status(400).json({ error: "E-mail is invalid" });
         }
 
-        const alreadyExists = await usersList.exists({ email: newEmail });
+        const alreadyExists = await usersModel.exists({ email: newEmail });
 
         if (alreadyExists) {
           return res.status(400).json({ error: "E-mail already exists" });
         }
       }
 
-      const updatedUser = await usersList.findByIdAndUpdate(
+      const updatedUser = await usersModel.findByIdAndUpdate(
         id,
         {
           name: name,
@@ -102,7 +102,7 @@ class userController {
         email: updatedUser.email,
       });
     } catch (error) {
-      return res.status(500).json({ error: error?.message });
+      return res.status(500).json("Internal server error");
     }
   }
 
@@ -119,7 +119,7 @@ class userController {
         return res.status(401).json({ error: "Password is invalid" });
       }
 
-      const userFound = await usersList.findById(id);
+      const userFound = await usersModel.findById(id);
 
       const checkPassword = await bcrypt.compareSync(
         password,
@@ -130,12 +130,12 @@ class userController {
         return res.status(401).json({ error: "Password is invalid" });
       }
 
-      await usersList.findByIdAndRemove(id);
-      await tasksList.deleteMany({ user_id: id });
+      await usersModel.findByIdAndRemove(id);
+      await tasksModel.deleteMany({ user_id: id });
 
-      return res.status(200).json({ success: true });
+      return res.status(200).json({ success: "The user was deleted" });
     } catch (error) {
-      return res.status(500).json({ error: error?.message });
+      return res.status(500).json("Internal server error");
     }
   }
 }

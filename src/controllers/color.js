@@ -1,15 +1,15 @@
-const appColorsList = require("../models/colors");
+const colorsModel = require("../models/colors");
 
-class colorController {
+class ColorController {
   async get(req, res) {
     try {
-      const colors = await appColorsList.find();
+      const colors = await colorsModel.find();
 
       return res.status(200).json(colors);
     } catch (error) {
-      return res.status(500).json({ error: error?.message });
+      return res.status(500).json("Internal server error");
     }
   }
 }
 
-module.exports = new colorController();
+module.exports = new ColorController();

@@ -1,11 +1,12 @@
+const commonErrors = require("../libs/commonErrors");
 const validation = require("../libs/validation");
-const categories = require("../models/categories");
-const tasksList = require("../models/tasks");
+const tasksModel = require("../models/tasks");
 
 class taskController {
   async post(req, res) {
     try {
       const userId = req.userId;
+
       const { initialDate, finalDate } = req.body;
       const { task, category, description, subTasks, checked } = req.body;
 
@@ -56,7 +57,7 @@ class taskController {
         return res.status(400).json({ error: "The task overcomming the day" });
       }
 
-      const newTask = await tasksList.create({
+      const newTask = await tasksModel.create({
         user_id: userId,
         category: category,
         task: task,
@@ -69,7 +70,7 @@ class taskController {
 
       return res.status(201).json(newTask);
     } catch (error) {
-      return res.status(500).json({ error: error?.message });
+      return commonErrors.internalServerError({ res });
     }
   }
 
@@ -77,6 +78,7 @@ class taskController {
     try {
       const userId = req.userId;
       const { initialDate, finalDate } = req.query;
+
       let initialDateTest = new Date(initialDate).toISOString;
       let finalDateTest = new Date(finalDate).toISOString;
 
@@ -94,7 +96,7 @@ class taskController {
           .json({ error: "Final date must be greater than start date" });
       }
 
-      const tasks = await tasksList
+      const tasks = await tasksModel
         .find({
           user_id: userId,
           initialDate: {
@@ -104,13 +106,13 @@ class taskController {
         })
         .exec();
 
-      const sortedTasks = tasks.sort(function (n1, n2) {
+      const sortedTasks = tasks.sort((n1, n2) => {
         return n1.initialDate - n2.initialDate;
       });
 
       return res.status(200).json(sortedTasks);
     } catch (error) {
-      return res.status(500).json({ error: error?.message });
+      return commonErrors.internalServerError({ res });
     }
   }
 
@@ -119,6 +121,7 @@ class taskController {
       const { initialDate, finalDate } = req.body;
       const { task, category, hexColor, description, subTasks, checked } =
         req.body;
+
       const id = req.params.id;
       const userId = req.userId;
 
@@ -172,17 +175,17 @@ class taskController {
         }
       }
 
-      const taskFound = await tasksList.findById(id);
+      const taskFound = await tasksModel.findById(id);
 
       if (!taskFound) {
-        return res.status(404).json({ error: "Task not found" });
+        return commonErrors.notFound({ res, nameInLowerCase: "task" });
       }
 
       if (!taskFound.user_id.equals(userId)) {
-        return res.status(401).json({ error: "Aceess denied" });
+        return commonErrors.forbidden({ res, nameInLowerCase: "task" });
       }
 
-      const updatedTask = await tasksList.findByIdAndUpdate(
+      const updatedTask = await tasksModel.findByIdAndUpdate(
         id,
         {
           task: task,
@@ -198,7 +201,7 @@ class taskController {
       );
       return res.status(200).json(updatedTask);
     } catch (error) {
-      return res.status(500).json({ error: error?.message });
+      return commonErrors.internalServerError({ res });
     }
   }
 
@@ -211,20 +214,20 @@ class taskController {
         return res.status(400).json({ error: "Id is invalid" });
       }
 
-      const taskFound = await tasksList.findById(id);
+      const taskFound = await tasksModel.findById(id);
 
       if (!taskFound) {
-        return res.status(404).json({ error: "Task not found" });
+        return commonErrors.notFound({ res, nameInLowerCase: "task" });
       }
 
       if (!taskFound.user_id.equals(userId)) {
-        return res.status(401).json({ error: "Aceess denied" });
+        return commonErrors.forbidden({ res, nameInLowerCase: "task" });
       }
 
-      const deletedTask = await tasksList.findByIdAndRemove(id);
+      const deletedTask = await tasksModel.findByIdAndRemove(id);
       return res.status(200).json(deletedTask);
     } catch (error) {
-      return res.status(500).json({ error: error?.message });
+      return commonErrors.internalServerError({ res });
     }
   }
 }

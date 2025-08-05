@@ -9,7 +9,7 @@ class appController {
 
       return res.status(200).json({ result: finalDate });
     } catch (error) {
-      return res.status(500).json({ error: error?.message });
+      return res.status(500).json("Internal server error");
     }
   }
 
@@ -30,7 +30,7 @@ class appController {
 
       return res.status(200).json({ result: listOfDays });
     } catch (error) {
-      return res.status(500).json({ error: error?.message });
+      return res.status(500).json("Internal server error");
     }
   }
 }

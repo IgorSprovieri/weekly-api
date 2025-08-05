@@ -5,7 +5,7 @@ const subTaskSchema = new mongoose.Schema(
   { _id: false }
 );
 
-const taskListSchema = new mongoose.Schema({
+const taskSchema = new mongoose.Schema({
   user_id: mongoose.Types.ObjectId,
   task: { type: String, default: " " },
   category: { name: String, hexColor: String },
@@ -16,4 +16,4 @@ const taskListSchema = new mongoose.Schema({
   checked: { type: Boolean, default: false },
 });
 
-module.exports = mongoose.model("tasks", taskListSchema);
+module.exports = mongoose.model("tasks", taskSchema);

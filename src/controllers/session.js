@@ -1,27 +1,28 @@
-const usersList = require("../models/users");
+const usersModel = require("../models/users");
 const validation = require("../libs/validation");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const randomToken = require("random-token");
 const Mail = require("../libs/Mail");
 const DateFNS = require("date-fns");
+const commonErrors = require("../libs/commonErrors");
 
-class sessionController {
+class SessionController {
   async login(req, res) {
     try {
       const { email, password } = req.body;
 
       if (!email || !validation.validateEmail(email)) {
-        return res.status(400).json({ error: "E-mail or password is invalid" });
+        return res.status(403).json({ error: "E-mail or password is invalid" });
       }
 
       if (!password || !validation.validatePassword(password)) {
-        return res.status(400).json({ error: "E-mail or password is invalid" });
+        return res.status(403).json({ error: "E-mail or password is invalid" });
       }
 
-      const userFound = await usersList.findOne({ email: email });
+      const userFound = await usersModel.findOne({ email: email });
       if (!userFound) {
-        return res.status(401).json({ error: "E-mail or password is invalid" });
+        return res.status(403).json({ error: "E-mail or password is invalid" });
       }
 
       const checkPassword = await bcrypt.compareSync(
@@ -30,7 +31,7 @@ class sessionController {
       );
 
       if (!checkPassword) {
-        return res.status(401).json({ error: "E-mail or password is invalid" });
+        return res.status(403).json({ error: "E-mail or password is invalid" });
       }
 
       const token = jwt.sign({ userId: userFound._id }, process.env.JWT_HASH, {
@@ -44,7 +45,7 @@ class sessionController {
         token: token,
       });
     } catch (error) {
-      return res.status(500).json({ error: error?.message });
+      return commonErrors.internalServerError({ res });
     }
   }
 
@@ -56,7 +57,7 @@ class sessionController {
         return res.status(400).json({ error: "E-mail or password is invalid" });
       }
 
-      const userFound = await usersList.findOne({ email: email });
+      const userFound = await usersModel.findOne({ email: email });
       if (!userFound) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -64,7 +65,7 @@ class sessionController {
       const resetPasswordToken = randomToken(6);
       const resetPasswordTokenHash = bcrypt.hashSync(resetPasswordToken, 10);
 
-      await usersList.findByIdAndUpdate(userFound._id, {
+      await usersModel.findByIdAndUpdate(userFound._id, {
         resetPasswordToken: resetPasswordTokenHash,
         resetPasswordTokenCratedAt: Date.now(),
       });
@@ -77,7 +78,7 @@ class sessionController {
 
       return res.status(200).json({ sucess: true });
     } catch (error) {
-      return res.status(500).json({ error: error?.message });
+      return commonErrors.internalServerError({ res });
     }
   }
 
@@ -97,7 +98,7 @@ class sessionController {
         return res.status(400).json({ error: "E-mail or password is invalid" });
       }
 
-      const userFound = await usersList.findOne({ email: email });
+      const userFound = await usersModel.findOne({ email: email });
       if (!userFound) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -122,15 +123,15 @@ class sessionController {
 
       const passwordHash = bcrypt.hashSync(password, 10);
 
-      await usersList.findByIdAndUpdate(userFound._id, {
+      await usersModel.findByIdAndUpdate(userFound._id, {
         passwordHash: passwordHash,
       });
 
       return res.status(200).json({ sucess: true });
     } catch (error) {
-      return res.status(500).json({ error: error?.message });
+      return commonErrors.internalServerError({ res });
     }
   }
 }
 
-module.exports = new sessionController();
+module.exports = new SessionController();
