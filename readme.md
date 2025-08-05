@@ -4,7 +4,7 @@
 
 Weekly it's a task manager API that include:
 
-- Users and login system with JWT
+- Users and login system with JWT and Mailjet
 - Create, read, update and delete tasks
 - Create, read, update and delete categories to use in your tasks
 - Get predefined colors to use in your categories
@@ -86,7 +86,7 @@ npm install
 </br>MY_EMAIL=
 </br>MY_EMAIL_NAME=Weekly
 
-You can create a JWT_HASH on site: [md5hashgenerator](https://www.md5hashgenerator.com)
+You can create a JWT_HASH on website: [md5hashgenerator](https://www.md5hashgenerator.com)
 
 The keys MJ_API_KEY, MJ_SECRET_KEY, MY_EMAIL, MY_EMAIL_NAME will be config below
 
@@ -216,8 +216,8 @@ To reset the password, the API send a email with a token. For this system work, 
 
 ## Author
 
-<img src="https://media.licdn.com/dms/image/D4D03AQFdLhogHwQVog/profile-displayphoto-shrink_800_800/0/1672976913935?e=1700092800&v=beta&t=wpMCLFnfgmrz3HXW-y9AdaXBSWw7gstVsPHTtTgcyuU" alt="Igor Sprovieri" style="width: 30%; border-radius: 50px;">
+<img src="./public/MyImage.jpeg" alt="Igor Sprovieri" style="width: 30%; border-radius: 32px;">
 
 ### _Igor Sprovieri Pereira_
 
-After working as a Unity developer for 3 years, I migrated to the web development area and currently have Fullstack knowledge with React and Node. I have an app for the Apple Store and Google Play and a library for creating web pages inspired by React.
+Developer since 2020, I already worked in games area with Unity, fullstack development area with React, React Native and Node, and actually I am specializing in backend.
