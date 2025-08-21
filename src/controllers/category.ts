@@ -59,7 +59,7 @@ class CategoryController {
         return commonErrors.notFound({ res, nameInLowerCase: "category" });
       }
 
-      if (categoryFound?.user_id === userId) {
+      if (categoryFound?.user_id?.toString() !== userId) {
         return commonErrors.forbidden({ res, nameInLowerCase: "category" });
       }
 
@@ -91,7 +91,7 @@ class CategoryController {
         return commonErrors.notFound({ res, nameInLowerCase: "category" });
       }
 
-      if (categoryFound?.user_id === userId) {
+      if (categoryFound?.user_id?.toString() !== userId) {
         return commonErrors.forbidden({ res, nameInLowerCase: "category" });
       }
 

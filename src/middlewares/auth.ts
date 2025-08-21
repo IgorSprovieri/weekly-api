@@ -10,7 +10,6 @@ export interface AuthRequest extends Request {
 
 export const authMiddleware: RequestHandler = async (req, res, next) => {
   const authHeader = req.headers.authorization;
-
   if (!authHeader) {
     return res.status(401).json({ error: "Token not provided" });
   }
@@ -19,17 +18,10 @@ export const authMiddleware: RequestHandler = async (req, res, next) => {
 
   try {
     const decoded = verify(token, enviroment.JWT_HASH) as JwtPayload;
-
     if (!decoded?.userId) {
       return res.status(401).json({ error: "Invalid Token" });
     }
 
-    const userFound = await usersModel.findById(decoded.userId);
-    if (!userFound) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    // 👇 você pode fazer type assertion diretamente no `req`
     (req as AuthRequest).userId = decoded.userId;
 
     next();

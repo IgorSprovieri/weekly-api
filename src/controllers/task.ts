@@ -181,7 +181,7 @@ class TaskController {
         return commonErrors.notFound({ res, nameInLowerCase: "task" });
       }
 
-      if (taskFound.user_id !== userId) {
+      if (taskFound.user_id?.toString() !== userId) {
         return commonErrors.forbidden({ res, nameInLowerCase: "task" });
       }
 
@@ -220,7 +220,7 @@ class TaskController {
         return commonErrors.notFound({ res, nameInLowerCase: "task" });
       }
 
-      if (taskFound.user_id !== userId) {
+      if (taskFound.user_id?.toString() !== userId) {
         return commonErrors.forbidden({ res, nameInLowerCase: "task" });
       }
 
